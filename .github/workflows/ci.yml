@@ -20,4 +20,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - run: npm run check:dist
       - run: npm test
+      - name: Test packed package (smoke)
+        run: |
+          npm pack
+          PACK="${{ github.workspace }}/$(ls backend-ai-starter-recipes-*.tgz)"
+          cd "$(mktemp -d)"
+          npm init -y
+          npm install "$PACK"
+          npx bare --help
+          npx bare --preset nestjs-prisma --output ./out
+          test -f out/.ai/AGENT.md

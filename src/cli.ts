@@ -29,6 +29,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const packageRootDir = path.resolve(__dirname, '..');
 
+/** Filename for skill definition; use constant so build never emits bare SKILL identifier. */
+const SKILL_FILENAME = 'SKILL.md' as const;
+
 const program = new Command();
 
 program
@@ -155,32 +158,32 @@ async function run() {
 
     // 3. Skills
     if (context.skills.includes('plan-review')) {
-      await writer.write('.ai/skills/plan-review/SKILL.md', await engine.render('skills/plan-review.hbs', context));
+      await writer.write(`.ai/skills/plan-review/${SKILL_FILENAME}`, await engine.render('skills/plan-review.hbs', context));
     }
     if (context.skills.includes('code-review')) {
-      await writer.write('.ai/skills/code-review/SKILL.md', await engine.render('skills/code-review-skill.hbs', context));
+      await writer.write(`.ai/skills/code-review/${SKILL_FILENAME}`, await engine.render('skills/code-review-skill.hbs', context));
       await writer.write('.ai/skills/code-review/checklist.md', await engine.render('skills/code-review-checklist.hbs', context));
     }
     if (context.skills.includes('qa')) {
-      await writer.write('.ai/skills/qa/SKILL.md', await engine.render('skills/qa.hbs', context));
+      await writer.write(`.ai/skills/qa/${SKILL_FILENAME}`, await engine.render('skills/qa.hbs', context));
     }
     if (context.skills.includes('ship')) {
-      await writer.write('.ai/skills/ship/SKILL.md', await engine.render('skills/ship.hbs', context));
+      await writer.write(`.ai/skills/ship/${SKILL_FILENAME}`, await engine.render('skills/ship.hbs', context));
     }
     if (context.skills.includes('document-release')) {
-      await writer.write('.ai/skills/document-release/SKILL.md', await engine.render('skills/document-release.hbs', context));
+      await writer.write(`.ai/skills/document-release/${SKILL_FILENAME}`, await engine.render('skills/document-release.hbs', context));
     }
     if (context.skills.includes('retro')) {
-      await writer.write('.ai/skills/retro/SKILL.md', await engine.render('skills/retro.hbs', context));
+      await writer.write(`.ai/skills/retro/${SKILL_FILENAME}`, await engine.render('skills/retro.hbs', context));
     }
     if (context.skills.includes('db-migration-review')) {
-      await writer.write('.ai/skills/db-migration-review/SKILL.md', await engine.render('skills/db-migration-review.hbs', context));
+      await writer.write(`.ai/skills/db-migration-review/${SKILL_FILENAME}`, await engine.render('skills/db-migration-review.hbs', context));
     }
     if (context.skills.includes('api-contract-check')) {
-      await writer.write('.ai/skills/api-contract-check/SKILL.md', await engine.render('skills/api-contract-check.hbs', context));
+      await writer.write(`.ai/skills/api-contract-check/${SKILL_FILENAME}`, await engine.render('skills/api-contract-check.hbs', context));
     }
     if (context.skills.includes('dependency-audit')) {
-      await writer.write('.ai/skills/dependency-audit/SKILL.md', await engine.render('skills/dependency-audit.hbs', context));
+      await writer.write(`.ai/skills/dependency-audit/${SKILL_FILENAME}`, await engine.render('skills/dependency-audit.hbs', context));
     }
 
     // 4. Context & Tracking

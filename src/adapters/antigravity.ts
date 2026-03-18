@@ -7,6 +7,9 @@ import path from 'path';
 import chalk from 'chalk';
 import { FileWriter } from '../writer.js';
 
+/** Filename for skill definition; use constant so build never emits bare SKILL identifier. */
+const SKILL_FILENAME = 'SKILL.md' as const;
+
 /**
  * One workflow file per skill directory containing SKILL.md.
  * @param outputDir - Target project root
@@ -23,10 +26,10 @@ export async function generateAntigravity(outputDir: string, writer: FileWriter)
       const stat = await fs.stat(skillPath);
       if (stat.isDirectory()) {
         try {
-          const content = await fs.readFile(path.join(skillPath, 'SKILL.md'), 'utf-8');
+          const content = await fs.readFile(path.join(skillPath, SKILL_FILENAME), 'utf-8');
           await writer.write(`.agents/workflows/${skill}.md`, content);
         } catch (e) {
-          /* skill without SKILL.md */
+          /* skill without SKILL_FILENAME */
         }
       }
     }
