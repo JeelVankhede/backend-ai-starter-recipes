@@ -9,7 +9,7 @@ Generate opinionated, customized AI agent instructions and workflows for your No
 
 **Package:** [`backend-ai-starter-recipes`](https://www.npmjs.com/package/backend-ai-starter-recipes) on npm. **Short CLI:** `bare` (after global install).
 
-Requires **Node.js 18+**.
+Requires **Node.js 20+**.
 
 ## Quick start
 
@@ -64,7 +64,7 @@ npx backend-ai-starter-recipes --preset fastify-drizzle --output ./my-fastify-ap
 ```bash
 npm ci
 npm run build   # CLI e2e tests use dist/cli.js
-npm test        # Vitest 3.x (keeps CI on Node 18; Vitest 4 needs Node 20.12+)
+npm test        # Vitest
 npm run test:coverage
 ```
 
