@@ -7,7 +7,7 @@ import { UserAnswers } from './types.js';
 
 /**
  * Runs the full stack/IDE/skills questionnaire.
- * @returns Structured answers for {@link buildContext}
+ * @returns Structured answers for `buildContext()` in context-builder
  */
 export async function askQuestions(): Promise<UserAnswers> {
   const projectName = await input({
