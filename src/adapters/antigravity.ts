@@ -1,5 +1,5 @@
 /**
- * Maps `.ai/skills/*/SKILL.md` into Antigravity `.agents/workflows/*.md`.
+ * Maps .ai/skills skill folders into Antigravity .agents/workflows markdown files.
  * @module adapters/antigravity
  */
 import fs from 'fs/promises';
@@ -8,7 +8,7 @@ import chalk from 'chalk';
 import { FileWriter } from '../writer.js';
 
 /**
- * One workflow file per skill directory containing `SKILL.md`.
+ * One workflow file per skill directory containing SKILL.md.
  * @param outputDir - Target project root
  * @param writer - Writer for the project root
  */

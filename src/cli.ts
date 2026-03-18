@@ -9,8 +9,8 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import path from 'path';
-import os from 'os';
 import { fileURLToPath } from 'url';
+import { expandPath } from './path-utils.js';
 import { askQuestions } from './prompts.js';
 import { buildContext } from './context-builder.js';
 import { TemplateEngine } from './engine.js';
@@ -30,18 +30,6 @@ const __dirname = path.dirname(__filename);
 const packageRootDir = path.resolve(__dirname, '..');
 
 const program = new Command();
-
-/**
- * Expands a leading `~` to the user home directory.
- * @param filepath - Raw path from user or CLI
- * @returns Absolute-friendly path segment
- */
-function expandPath(filepath: string) {
-  if (filepath.startsWith('~/') || filepath === '~') {
-    return filepath.replace('~', os.homedir());
-  }
-  return filepath;
-}
 
 program
   .name('backend-ai-starter-recipes')
