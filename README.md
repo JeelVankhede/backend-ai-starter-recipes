@@ -64,7 +64,7 @@ npx backend-ai-starter-recipes --preset fastify-drizzle --output ./my-fastify-ap
 ```bash
 npm ci
 npm run build   # CLI e2e tests use dist/cli.js
-npm test        # vitest
+npm test        # Vitest 3.x (keeps CI on Node 18; Vitest 4 needs Node 20.12+)
 npm run test:coverage
 ```
 
