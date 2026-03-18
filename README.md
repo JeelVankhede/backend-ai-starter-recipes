@@ -1,10 +1,15 @@
 # Backend AI Starter Recipes
 
+[![CI](https://github.com/JeelVankhede/backend-ai-starter-recipes/actions/workflows/ci.yml/badge.svg)](https://github.com/JeelVankhede/backend-ai-starter-recipes/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/backend-ai-starter-recipes.svg)](https://www.npmjs.com/package/backend-ai-starter-recipes)
+[![Node.js](https://img.shields.io/node/v/backend-ai-starter-recipes)](https://github.com/JeelVankhede/backend-ai-starter-recipes/blob/main/package.json)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/JeelVankhede/backend-ai-starter-recipes/blob/main/LICENSE)
+
 Generate opinionated, customized AI agent instructions and workflows for your Node.js backend projects.
 
 **Package:** [`backend-ai-starter-recipes`](https://www.npmjs.com/package/backend-ai-starter-recipes) on npm. **Short CLI:** `bare` (after global install).
 
-Requires **Node.js 18+**.
+Requires **Node.js 20+**.
 
 ## Quick start
 
@@ -53,6 +58,15 @@ npx backend-ai-starter-recipes --preset fastify-drizzle --output ./my-fastify-ap
 - `.ai/skills/` — workflows (plan-review, code-review, qa, ship, …)
 - `.ai/context/`, `.ai/tracking/` — reference and metrics
 - Plus adapters for each selected IDE
+
+## Development
+
+```bash
+npm ci
+npm run build   # CLI e2e tests use dist/cli.js
+npm test        # Vitest
+npm run test:coverage
+```
 
 ## Repository & contributing
 
