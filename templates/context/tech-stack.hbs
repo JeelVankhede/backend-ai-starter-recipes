@@ -1,0 +1,31 @@
+# Tech Stack
+
+This file defines the approved technologies for **{{projectName}}**. 
+
+**DO NOT** automatically introduce new libraries, frameworks, or databases without explicit architectural approval. Use what is already provided here.
+
+| Category | Technology |
+| :------- | :--------- |
+| **Language** | {{language}} |
+| **Framework** | {{framework}} |
+{{#if (neq orm "none")}}
+| **Database** | {{database}} |
+| **Query/ORM** | {{orm}} |
+{{/if}}
+| **Validation** | {{validation}} |
+{{#if hasSwagger}}
+| **API Docs** | Swagger / OpenAPI |
+{{/if}}
+{{#if (neq auth "none")}}
+| **Auth** | {{auth}} |
+{{/if}}
+| **Testing** | {{testFramework}} |
+{{#if monitoring.length}}
+| **Monitoring** | {{monitoring}} |
+{{/if}}
+{{#if (neq cicd "none")}}
+| **CI/CD** | {{cicd}} |
+{{/if}}
+
+## Rationale
+*(Optional: Explain why certain non-obvious choices were made here, e.g., why Drizzle instead of Prisma)*

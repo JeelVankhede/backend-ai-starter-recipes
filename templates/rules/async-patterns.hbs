@@ -1,0 +1,22 @@
+# Async & Background Processing
+
+## Queues & Background Jobs
+- Do not perform heavy, non-blocking I/O tasks within the synchronous HTTP request-response cycle (e.g., sending emails, generating PDFs, resizing images).
+- Offload these tasks to a background queue system (e.g. BullMQ, RabbitMQ, SQS).
+{{#if isNestJS}}
+- Use NestJS `@nestjs/bull` or similar abstractions to wrap queue providers.
+{{/if}}
+
+## Job Design
+1. **Idempotency:** Background jobs must be idempotent. If a job fails halfway and retries, it should not corrupt the database or send duplicate emails.
+2. **Granularity:** Keep jobs small and focused.
+3. **Payloads:** Store minimal payload data in the queue (e.g., store only the `userId`, not the entire user object). Fetch fresh data from the database inside the job processor.
+
+## Failures & Retries
+- Configure sensible retry limits (e.g., 3 retries with exponential backoff).
+- All failed jobs must eventually move to a Dead Letter Queue (DLQ) for manual inspection.
+- Ensure APM monitoring or error tracking captures failed background jobs, not just HTTP requests.
+
+## Cron & Scheduled Tasks
+- Do not run scheduled tasks directly in the main web server pool if scaling horizontally (this prevents the job from running N times on N servers).
+- Use a distributed locking mechanism or a dedicated worker tier for cron jobs.

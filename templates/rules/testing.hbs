@@ -1,0 +1,32 @@
+# Testing Guidelines
+
+## Framework
+This project uses **{{testFramework}}** for testing.
+
+{{> testCommands }}
+
+## Unit Tests
+- Co-locate unit tests with the code they are testing (e.g. `user.service.spec.ts` next to `user.service.ts`).
+{{#if isNestJS}}
+- Use NestJS `TestBed` to create isolated testing modules.
+- Mock all repository and external service dependencies using standard `jest.mock()` or custom mock providers in the TestBed.
+{{else if isExpress}}
+- Use a mock HTTP `req` and `res` object when testing controllers directly.
+{{else if isFastify}}
+- Use `fastify.inject()` to test route handlers without listening on a port.
+{{else if isHono}}
+- Use Hono's `app.request()` for lightweight integration & unit testing.
+{{/if}}
+
+## E2E Tests
+- Place e2e tests in the `test/` directory at the project root.
+- E2E tests should spin up the full application and hit a real (test-specific) database.
+- Clear the database between test runs using a teardown script or `beforeEach` hook.
+
+## Mocking Conventions
+- Only mock external boundaries (databases, 3rd party APIs, queues).
+- Do not over-mock internal business logic if testing it all together is fast and deterministic.
+
+## JSDoc and Documentation
+- Clearly comment complex test setups.
+- Use the `Arrange, Act, Assert` pattern in every test block.

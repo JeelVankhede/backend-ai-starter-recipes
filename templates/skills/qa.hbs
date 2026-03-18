@@ -1,0 +1,26 @@
+---
+description: Systematic API quality testing
+---
+
+# QA Skill
+
+This skill acts as your QA Engineer, systematically validating endpoints.
+
+## Process
+
+1. **Static Analysis**
+   {{> buildCommands }}
+   - Run `{{lintCommand}}`
+
+2. **Test Execution**
+   {{> testCommands }}
+
+3. **Endpoint Validation**
+   - Identify newly added or changed endpoints.
+   {{#if hasSwagger}}
+   - Verify Swagger documentation matches the implementation.
+   {{/if}}
+   - Check error handling by sending invalid payloads.
+
+## Report Format
+Produce a QA Scorecard indicating passes/failures and assigning an overall Health Score (0-100%).

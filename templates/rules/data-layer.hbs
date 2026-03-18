@@ -1,0 +1,41 @@
+# Data Layer ({{orm}})
+
+## Repository Pattern
+{{> repositoryPattern }}
+
+## Schema & Models
+
+{{#if hasPrisma}}
+- **Schema Location:** `{{ormSchemaPath}}`
+- Use UUIDs for all primary keys unless otherwise specified.
+- Use `BigInt` or `Decimal` for financial amounts (never Float).
+- Enforce constraints (unique, default values) at the schema level.
+{{else if hasTypeORM}}
+- **Entities Location:** `{{ormSchemaPath}}`
+- Use `@PrimaryGeneratedColumn('uuid')` for primary keys.
+- Use `type: 'decimal'` or `type: 'numeric'` for financial amounts.
+- Explicitly define relationships using `@OneToMany`, `@ManyToOne`, etc.
+{{else if hasDrizzle}}
+- **Schema Location:** `{{ormSchemaPath}}`
+- Define tables using Drizzle's generic functions for the specific SQL dialect.
+- Use `uuid('id').defaultRandom().primaryKey()`
+{{else if hasMikroORM}}
+- **Entities Location:** `{{ormSchemaPath}}`
+- Use `@PrimaryKey({ type: 'uuid' })` with a UUID generator default.
+- Use `require: true` and `unique: true` column decorators strictly.
+{{else if hasKnex}}
+- Use Knex query builder strictly in repository methods.
+- Define tables in migration files.
+{{/if}}
+
+## Migration Conventions
+
+{{> migrationCommands }}
+
+- Migrations must be atomic. One logical change per migration.
+- **NEVER** edit an existing migration file that has already been merged or applied in production. Always create a new one.
+- Keep migration names highly descriptive (e.g. `add_status_to_users_table`).
+- Always test migrations up and down locally before committing.
+
+## Data Seeding
+Use the project's seeding strategy (if provided) to populate lookups and initial admin states for development and testing. Do not rely on ad-hoc SQL inserts during setup.

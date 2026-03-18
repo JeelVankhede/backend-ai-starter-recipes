@@ -1,0 +1,16 @@
+{
+  "projectName": "nestjs-typeorm-app",
+  "projectDescription": "A robust NestJS backend with TypeORM",
+  "framework": "nestjs",
+  "language": "typescript",
+  "orm": "typeorm",
+  "database": "postgresql",
+  "validation": "class-validator",
+  "apiDocs": "swagger",
+  "auth": "jwt-passport",
+  "testFramework": "jest",
+  "monitoring": ["sentry"],
+  "cicd": "github-actions",
+  "ideTargets": ["cursor", "claude-code", "vscode-copilot"],
+  "skills": ["plan-review", "code-review", "qa", "ship"]
+}

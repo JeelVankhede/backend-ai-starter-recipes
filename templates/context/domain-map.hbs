@@ -1,0 +1,37 @@
+# Domain Map: {{projectName}}
+
+This document maps out the high-level architecture and domain boundaries of our {{framework}} application.
+
+## 1. System Context
+*(Describe the overall purpose of the system and its primary actors/users here)*
+
+## 2. Key Directories
+| Path | Purpose |
+| ---- | ------- |
+{{#if isNestJS}}
+| `src/modules/` | Feature modules containing domain logic |
+| `src/common/` | Reusable utilities, custom decorators, global filters |
+| `src/external/` | Wrappers for 3rd-party API integrations |
+{{else}}
+| `src/api/` | Route definitions and controllers |
+| `src/services/` | Business logic layer |
+| `src/repositories/`| Data access layer |
+| `src/middleware/` | Custom {{framework}} middleware |
+{{/if}}
+{{#if (neq orm "none")}}
+| `{{ormSchemaPath}}` | Database schemas and migrations |
+{{/if}}
+
+## 3. Core Domains
+*(List the main business entities, e.g. Users, Orders, Payments, and their relationships)*
+- **User Domain:** Handles authentication and profiles.
+- **...**
+
+## 4. Notable Patterns & Rules
+- All requests flow from **Controller → Service → Repository**.
+- Background tasks are processed via [Queue System].
+- Validation is handled by {{validation}}.
+
+## 5. Common Pitfalls
+*(List historical mistakes or things that trip up new developers on this specific codebase)*
+- E.g. "Do not use `Float` for currency, always use `BigInt`."

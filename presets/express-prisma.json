@@ -1,0 +1,16 @@
+{
+  "projectName": "express-prisma-app",
+  "projectDescription": "A lightweight Express backend with Prisma",
+  "framework": "express",
+  "language": "typescript",
+  "orm": "prisma",
+  "database": "postgresql",
+  "validation": "zod",
+  "apiDocs": "none",
+  "auth": "session",
+  "testFramework": "vitest",
+  "monitoring": [],
+  "cicd": "github-actions",
+  "ideTargets": ["cursor"],
+  "skills": ["plan-review", "code-review", "qa"]
+}

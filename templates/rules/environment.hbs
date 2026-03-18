@@ -1,0 +1,26 @@
+# Environment & Configuration
+
+## Environment Variables (`.env`)
+- Never commit `.env` files to source control.
+- Maintain a `.env.example` file with dummy values for all required variables.
+- All configuration values must be loaded from environment variables (12-Factor App methodology).
+
+## Configuration Management
+{{#if isNestJS}}
+- Use `@nestjs/config` and the `ConfigService` for all config injection.
+- Never use `process.env` directly in application code outside of `app.module.ts`.
+- Validate environment variables on startup using `class-validator` or `zod`.
+{{else}}
+- Centralize config loading in a single `config.ts` file.
+- Validate `process.env` using your validation library (e.g., Zod) on system boot so the app crashes immediately if misconfigured.
+- Import from `config.ts`, not `process.env`, in your feature logic.
+{{/if}}
+
+## Feature Flags
+- Use feature flags for partially completed features.
+- Keep feature flag checks at the controller/router level or service boundary, not deeply nested within repositories.
+
+## Containerization (Docker)
+- Use multi-stage builds in Dockerfiles to keep production images tiny.
+- Always include a pristine `.dockerignore` file.
+- Run the application as a non-root user inside the container for security.

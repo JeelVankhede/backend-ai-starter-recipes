@@ -1,0 +1,15 @@
+---
+description: Auto-update docs after shipping
+---
+
+# Document Release Skill
+
+Use this skill immediately after landing a significant feature or fix.
+
+## Responsibility
+Review the recently merged code via `git log -p -1` or `git diff HEAD~1` and update:
+1. `README.md` if the project architecture, dependencies, or setup instructions changed.
+2. `CHANGELOG.md` with a summary of the release.
+3. API documentation or Swagger definitions if endpoints changed.
+
+{{> gitRules }}

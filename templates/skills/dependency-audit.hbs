@@ -1,0 +1,16 @@
+---
+description: Reviews dependencies for security and size
+---
+
+# Dependency Audit Skill
+
+Run this skill when `package.json` or lockfiles change.
+
+## Review Steps
+1. **Security:** Run `npm audit` (or `yarn audit` / `pnpm audit`) and report critical/high vulnerabilities.
+2. **Necessity:** Are the new dependencies actually required, or is there a built-in Node.js module that can do the job (e.g., `fetch` instead of `axios` if on modern Node)?
+3. **Bundle/Performance Impact:** Will this dependency significantly bloat the production build or slow down the build process?
+4. **License Compliance:** Ensure the new dependency uses an OSI-approved license (MIT, Apache-2.0, BSD) and flag restrictive licenses (GPL, AGPL) for review.
+
+## Output
+Approve the PR if safe, or request changes detailing risky/unnecessary packages.

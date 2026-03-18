@@ -1,0 +1,46 @@
+# Errors, Logging, and Security
+
+## Error Handling
+
+{{#if isNestJS}}
+- Never return res.status() manually from controllers.
+- Throw appropriate NestJS `HttpException` classes (e.g., `NotFoundException`, `BadRequestException`).
+- Use the global `ExceptionFilter` to catch unhandled errors and format them consistently.
+{{else if isExpress}}
+- Use an async wrapper to catch rejected promises and pass them to `next(err)`.
+- Use a global error-handling middleware `(err, req, res, next)` at the end of the middleware stack.
+{{else if isFastify}}
+- Define a custom `errorHandler` via `fastify.setErrorHandler()`.
+{{else if isHono}}
+- Use `app.onError((err, c) => ...)` to catch and format all unhandled exceptions.
+{{/if}}
+
+- Never leak internal server errors, database stack traces, or sensitive config values in HTTP responses.
+- Map domain errors to standard HTTP status codes (e.g., `EntityNotFound` -> `404`, `ValidationFailed` -> `400`).
+
+## Logging & Observability
+
+- Use structured JSON logging for all production logs.
+- Include a `correlation_id` (Trace ID) in all logs associated with a request lifecycle.
+- **Never** log PII (Personally Identifiable Information), passwords, tokens, or financial specifics.
+{{#if (includes monitoring "sentry")}}
+- Send unhandled exceptions and critical errors to Sentry.
+{{/if}}
+{{#if (includes monitoring "apm")}}
+- Ensure APM transaction tracing is wrapped around background jobs and HTTP requests.
+{{/if}}
+
+## Security
+
+{{#if (eq auth "jwt-passport")}}
+- Validate JWT signatures on all protected routes.
+- Extract user IDs from the verified token payload, not from request bodies.
+{{else if (eq auth "session")}}
+- Ensure session cookies are set with `HttpOnly`, `Secure`, and `SameSite=lax/strict` flags.
+- Use a secure session store (e.g. Redis), not memory storage for production.
+{{else if (eq auth "oauth2-provider")}}
+- Trust identity verification from the external Auth provider.
+- Validate incoming webhooks or session claims tightly.
+{{/if}}
+
+- Always enforce authorization (who is making the request) **and** resource ownership (are they allowed to touch this specific record ID?).

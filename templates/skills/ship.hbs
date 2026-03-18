@@ -1,0 +1,27 @@
+---
+description: Automated ship workflow
+---
+
+# Ship Skill
+
+This skill automates the process of landing code safely.
+
+## Workflow
+
+1. **Pre-flight Checks**
+   {{> buildCommands }}
+   {{> testCommands }}
+
+2. **Git Status Check**
+   - Ensure you are on a feature branch.
+   - Run `git status` to see what is uncommitted.
+   
+3. **Commit & Push**
+   - Stage changes: `git add .`
+   - Commit: `git commit -m "feat/fix: ..."` (Ask user to confirm message first)
+   - Push: `git push origin HEAD`
+
+4. **Pull Request**
+   - If user confirms, run the CLI tool (e.g. `gh pr create`) to open a PR.
+
+{{> gitRules }}

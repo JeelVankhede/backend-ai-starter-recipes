@@ -1,0 +1,26 @@
+{{#if isNestJS}}
+All database access goes through `[feature].repository.ts`.
+Services **never** import `{{ormServiceName}}` directly. This encapsulates the data layer and enables easier mocking in tests.
+
+**Implementation:**
+- Inject `{{ormServiceName}}` into your repository class.
+- Provide repositories in the feature module.
+- Services inject the repository, never `{{ormServiceName}}`.
+{{else if isExpress}}
+All database access goes through `{feature}.repository.ts`.
+Controllers **never** import `{{ormServiceName}}` directly.
+
+**Implementation:**
+- Pass the `{{ormServiceName}}` to repository constructors or use a DI container.
+- Controllers call service methods, and services call repository methods.
+{{else if isFastify}}
+All database access goes through `{feature}.repository.ts`.
+Route handlers **never** import the database instance directly.
+
+**Implementation:**
+- Decorate the fastify instance with your repositories or use a DI container.
+- Services/handlers use `fastify.repositories.feature` instead of raw queries.
+{{else if isHono}}
+All database access goes through `{feature}.repository.ts`.
+Route handlers **never** import the database instance directly.
+{{/if}}

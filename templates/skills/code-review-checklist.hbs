@@ -1,0 +1,32 @@
+# Code Review Checklist
+
+This checklist defines what constitutes a "Critical" code review failure.
+
+## Critical Checks (Blocking)
+
+### Security & Auth
+{{#if hasAuth}}
+- Are protected routes properly guarded?
+- Is the user ID extracted from a trusted token, not client input?
+{{/if}}
+- Is PII logged?
+
+### Data Layer ({{orm}})
+{{#if hasPrisma}}
+- Does the migration drop data without a backfill?
+- Are missing unique constraints applied?
+{{else if hasTypeORM}}
+- Are `@Transaction()` decorators used correctly?
+- Did migrations get generated properly without data loss?
+{{/if}}
+
+### Architecture ({{framework}})
+{{#if isNestJS}}
+- Are services bleeding into controllers?
+- Is DI configured correctly (no manual `new Service()` calls)?
+{{else}}
+- Are routers properly encapsulated?
+- Are error handlers catching async rejections?
+{{/if}}
+
+{{> gitRules }}

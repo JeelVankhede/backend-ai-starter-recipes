@@ -1,0 +1,45 @@
+---
+description: Master instructions for AI agents working on this project
+alwaysApply: true
+---
+
+# Master Agent Instructions
+
+Welcome to the **{{projectName}}** codebase! This is a {{framework}} service written in {{language}}.
+
+{{projectDescription}}
+
+## Core Principles
+
+1. **Be concise:** No pleasantries. Skip to the code.
+2. **Read first, write second:** Always view the relevant file contents and grep for existing patterns before authoring new code.
+3. **Plan-first approach:** For complex logic, propose a brief implementation plan before modifying files.
+4. **Follow conventions:** If a pattern exists in the codebase (e.g., how we handle {{#if hasAuth}}auth, {{/if}}errors, {{#if hasPrisma}}Prisma, {{/if}}etc.), match it perfectly. Do not spontaneously introduce new libraries or alternate patterns.
+
+## Tech Stack Overview
+
+- **Framework:** {{framework}}
+- **Language:** {{language}}
+{{#if (neq orm "none")}}
+- **Database:** {{database}} via {{orm}}
+{{/if}}
+{{#if (neq validation "none")}}
+- **Validation:** {{validation}}
+{{/if}}
+{{#if hasSwagger}}
+- **API Docs:** Swagger/OpenAPI
+{{/if}}
+{{#if hasAuth}}
+- **Auth:** {{auth}}
+{{/if}}
+
+For detailed architectural maps, see `.ai/context/domain-map.md`.
+
+## Quality Gates
+
+Before finalizing an implementation, ensure it passes these checks:
+- **Build:** `{{buildCommand}}`
+- **Lint:** `{{lintCommand}}`
+- **Test:** `{{testCommand}}`
+
+If tests fail, fix the tests or fix the code. Never leave breaking tests.

@@ -1,0 +1,52 @@
+# Architecture & Component Structure
+
+{{#if isNestJS}}
+This project uses NestJS. All business logic must be encapsulated in Feature Modules.
+
+## NestJS Module Structure
+- Features belong in `src/modules/<feature-name>/`
+- Register all controllers, services, and repositories in the feature module (`<feature>.module.ts`).
+- Ensure the module exports services that other modules need, rather than importing raw services across feature boundaries.
+
+## Dependency Injection (DI)
+Use constructor-based injection.
+```typescript
+constructor(
+  private readonly userService: UserService,
+  private readonly configService: ConfigService,
+) {}
+```
+{{else if isExpress}}
+This project uses Express.
+
+## Router & Middleware Structure
+- Group related routes into sub-routers in `src/routes/` or feature-based folders like `src/api/<feature>/`.
+- Mount feature routers in your main `app.ts` or `server.ts`.
+- Use Express middleware for cross-cutting concerns (auth, logging) rather than duplicating logic in handlers.
+{{else if isFastify}}
+This project uses Fastify.
+
+## Plugin Ecosystem
+- Use `fastify-plugin` (`fp`) to share decorators, hooks, and services across plugins.
+- Group related routes into feature plugins.
+- Keep the `server.js` or `app.js` entry point minimal, delegating to encapsulated plugins.
+{{else if isHono}}
+This project uses Hono.
+
+## App & Group Structure
+- Group routes using Hono's `.route()` method for modularity.
+- Place feature-specific handlers in `src/api/<feature>/`.
+- Use built-in middleware when possible or write custom middleware using `c.next()`.
+{{/if}}
+
+## Repository Pattern
+{{> repositoryPattern }}
+
+## General App Architecture
+- **Controllers/Handlers:** Parse requests, call services, format responses. No complex business logic.
+- **Services:** Pure business logic. They do not know about HTTP requests or responses.
+- **Repositories:** Data access layer. Handles all direct DB/ORM calls.
+- **Global Pipes/Interceptors/Middleware:** Use for authentication, request logging, and global error catch-alls.
+
+## Graceful Shutdown
+Always ensure the HTTP server and database connections close gracefully on SIGTERM and SIGINT signals to avoid dropping requests during deployments.

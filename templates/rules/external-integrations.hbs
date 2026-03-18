@@ -1,0 +1,27 @@
+# External Integrations
+
+Any code that calls a 3rd party API (e.g., Stripe, SendGrid, Twilio, AWS) must be cleanly abstracted.
+
+## Wrapper Service Pattern
+- Never sprinkle direct API calls (e.g., `fetch()`, `axios.get()`) inside your core domain services.
+- Create a dedicated wrapper service for the integration.
+{{#if isNestJS}}
+- Place the wrapper in `src/external/<service-name>/`.
+- Provide the service via an explicit module (`StripeModule`) and export the service.
+{{else}}
+- Place the wrapper in `src/external/<service-name>.ts`.
+- Instantiate the service with necessary API keys from config and inject it or import it where needed.
+{{/if}}
+
+## Error Handling
+- Do not let 3rd party HTTP errors bubble up as raw HTTP responses to our clients.
+- Catch all 3rd party SDK errors in the wrapper service.
+- Map them to your own domain exceptions. Log the raw 3rd party error (with correlation IDs) internally.
+
+## Retries & Timeouts
+- Use an HTTP client that supports circuit breakers, timeouts, and automatic retries for transient errors.
+- Do not hang indefinitely on external service calls. Set hard timeouts (e.g. 5000ms max).
+
+## Webhooks
+- Webhooks must verify cryptographic signatures provided by the 3rd party.
+- Offload heavy processing from webhook endpoints to background queues immediately after verification.

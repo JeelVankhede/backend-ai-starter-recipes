@@ -1,0 +1,53 @@
+# API Validation & Patterns
+
+{{#if (eq validation "class-validator")}}
+## Request Validation
+- Use `class-validator` and `class-transformer` on all DTOs.
+- Enable `ValidationPipe` globally with `whitelist: true` and `transform: true`.
+- Example decorators: `@IsString()`, `@IsOptional()`, `@IsUUID()`.
+{{else if (eq validation "zod")}}
+## Request Validation
+- Define all input schemas using `zod`.
+- Use a validation middleware/pipe to intercept requests and validate `req.body` or `req.query` against the Zod schema.
+- Extract TypeScript types from schemas using `z.infer<typeof schema>`.
+{{else if (eq validation "joi")}}
+## Request Validation
+- Define all input schemas using `joi`.
+- Validate payloads using schema.validate() in middleware before reaching the core logic.
+{{else}}
+## Request Validation
+- Ensure all incoming payloads (body, query, params) are validated and sanitized before processing.
+{{/if}}
+
+{{#if hasSwagger}}
+## API Documentation (Swagger)
+- Every endpoint must have complete Swagger documentation.
+- Use `@ApiTags()`, `@ApiOperation()`, and `@ApiResponse()`.
+- Document all DTO properties with `@ApiProperty()` including examples and required status.
+{{/if}}
+
+## Pagination
+- Prefer cursor-based pagination for high-volume endpoints.
+- Offset pagination is permissible for low-volume administrative endpoints.
+- Always wrap paginated responses in a standard envelope:
+  ```json
+  {
+    "data": [...],
+    "meta": {
+      "nextCursor": "...",
+      "hasNextPage": true
+    }
+  }
+  ```
+
+## Rate Limiting & Throttling
+- Apply default rate limits to all public endpoints.
+- Apply strict rate limits to auth, login, and mutation endpoints to prevent brute forcing.
+
+## CORS & Security Headers
+- Ensure CORS is restricted to known origins.
+- Use Helmet or equivalent to set strict security headers.
+
+## API Versioning
+- Use URI versioning (e.g. `/v1/users`) for all endpoints.
+- When introducing breaking changes, bump the version rather than mutating existing contracts.

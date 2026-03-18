@@ -1,0 +1,16 @@
+{
+  "projectName": "fastify-drizzle-app",
+  "projectDescription": "A high-performance Fastify backend with Drizzle",
+  "framework": "fastify",
+  "language": "typescript",
+  "orm": "drizzle",
+  "database": "postgresql",
+  "validation": "zod",
+  "apiDocs": "none",
+  "auth": "jwt-passport",
+  "testFramework": "vitest",
+  "monitoring": ["sentry", "apm"],
+  "cicd": "github-actions",
+  "ideTargets": ["windsurf"],
+  "skills": ["plan-review", "code-review", "qa", "ship"]
+}

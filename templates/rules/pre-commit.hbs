@@ -1,0 +1,32 @@
+# Pre-commit Quality Gates
+
+Before committing or pushing any code, ensure you have run the following local checks. Do not rely solely on CI to catch basic errors.
+
+## The Gates
+
+1. **Lint & Formatting**
+   - Run: `{{lintCommand}}`
+   - Fix all autofixable issues before proceeding.
+
+2. **Type Checking & Build**
+   {{> buildCommands }}
+   - Zero TypeScript compiler errors are allowed.
+
+3. **Database Migrations**
+   {{#if (neq orm "none")}}
+   - Ensure you have generated any necessary migrations for schema changes.
+   {{> migrationCommands }}
+   {{else}}
+   - Ensure database scripts are up to date.
+   {{/if}}
+
+4. **Testing**
+   {{> testCommands }}
+   - All tests must pass. If you changed a behavior, update the corresponding test.
+
+## Fix-First Heuristic
+If you encounter errors during these gates, **fix them immediately** before adding new features. Do not stack feature code on top of failing builds or tests.
+
+## Suppressions
+- Use `@ts-expect-error` instead of `@ts-ignore` and always include a brief comment explaining why it is necessary.
+- ESLint suppressions (e.g. `// eslint-disable-next-line`) are allowed only when strictly necessary and must include a justification.

@@ -1,0 +1,20 @@
+---
+description: Detects breaking changes in API contracts
+---
+
+# API Contract Check Skill
+
+Use this skill when API controllers, routers, or DTO/validation schemas are modified.
+
+## Objective
+Ensure we do not break backward compatibility for client applications without bumping the API version.
+
+## Review Process
+1. Analyze the git diff for changes to:
+   - Request DTOs / Schemas (e.g., fields removed or made required).
+   - Response DTOs / Payloads (e.g., fields removed, renamed, or types changed).
+   - Route definitions (e.g., paths changed, parameters removed).
+2. If {{#if hasSwagger}}Swagger definitions{{else}}API Docs{{/if}} are present, ensure they accurately reflect the changes.
+
+## Output
+Produce a report detailing any breaking changes. If a change is breaking, suggest either reverting it or bumping the application API version.

@@ -1,0 +1,65 @@
+{
+  "name": "backend-ai-starter-recipes",
+  "version": "1.0.0",
+  "description": "Interactive CLI for generating AI agent instructions and workflows for Node.js backend projects",
+  "type": "module",
+  "main": "dist/cli.js",
+  "bin": {
+    "backend-ai-starter-recipes": "./dist/cli.js",
+    "bare": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "presets",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "start": "node dist/cli.js",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cli",
+    "ai",
+    "cursor",
+    "claude",
+    "copilot",
+    "backend",
+    "nestjs",
+    "express",
+    "fastify",
+    "prisma",
+    "agent",
+    "rules",
+    "windsurf"
+  ],
+  "author": "Jeel Vankhede <jeelvankhede@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JeelVankhede/backend-ai-starter-recipes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JeelVankhede/backend-ai-starter-recipes/issues"
+  },
+  "homepage": "https://github.com/JeelVankhede/backend-ai-starter-recipes#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^8.3.2",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "handlebars": "^4.7.8"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.9",
+    "@types/node": "^25.5.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}

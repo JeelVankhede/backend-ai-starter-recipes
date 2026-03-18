@@ -1,0 +1,20 @@
+{{#if hasPrisma}}
+- Create new migration: `npx prisma migrate dev --name <descriptive_name>`
+- Apply migrations (prod): `npx prisma migrate deploy`
+- Generate Prisma Client: `npx prisma generate`
+{{else if hasTypeORM}}
+- Generate migration: `npx typeorm migration:generate -n <DescriptiveName>`
+- Run migrations: `npx typeorm migration:run`
+- Revert migration: `npx typeorm migration:revert`
+{{else if hasDrizzle}}
+- Generate migration: `npx drizzle-kit generate`
+- Push schema to DB (dev): `npx drizzle-kit push`
+- Run migrations (prod): `npx drizzle-kit migrate`
+{{else if hasMikroORM}}
+- Create migration: `npx mikro-orm migration:create`
+- Run migrations: `npx mikro-orm migration:up`
+{{else if hasKnex}}
+- Make migration: `npx knex migrate:make <descriptive_name>`
+- Run migrations: `npx knex migrate:latest`
+- Rollback: `npx knex migrate:rollback`
+{{/if}}

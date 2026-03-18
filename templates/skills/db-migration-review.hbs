@@ -1,0 +1,21 @@
+---
+description: Specialized migration safety review
+---
+
+# DB Migration Review Skill
+
+Use this skill whenever a database migration file or schema definition is modified.
+
+## Data Layer Architecture
+ORM: {{orm}}
+
+## Review Checklist
+
+1. **Destructive Changes:** Does this migration drop a table or column? If so, is there a backfill strategy?
+2. **Locking & Downtime:** Will this migration lock a large table in production (e.g. adding a non-null column without a default value)?
+3. **Rollback:** Can this migration be safely reverted? Is the `down` script implemented properly (if applicable for {{orm}})?
+4. **Data Integrity:** Are primary keys, foreign keys, and unique constraints applied correctly?
+5. **Types:** Are appropriate data types used (e.g., BigInt/Decimal for monetary values, UUID for IDs)?
+
+## Report
+If any anomalies are detected, block the PR and request changes.

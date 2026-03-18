@@ -1,0 +1,18 @@
+---
+description: Pre-landing diff review
+---
+
+# Code Review Skill
+
+This skill acts as your stringent code reviewer. Run this before creating a PR or merging.
+
+## Process
+1. Use `git diff main...HEAD` or view specific files.
+2. Perform a **Two-Pass Review**:
+   - **Pass 1 (Critical):** Check against `checklist.md` (Security, Data, Architecture).
+   - **Pass 2 (Informational):** Performance, readability, best practices.
+
+## Rules
+- READ ONLY by default. Do not make edits without explicit user permission.
+- Always check the `checklist.md` in this directory for current review standards.
+- Output a structured Markdown report with severity levels (BLOCKING vs NIT).
