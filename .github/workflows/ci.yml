@@ -23,6 +23,7 @@ jobs:
       - run: npm run build
       - run: npm run check:dist
       - run: npm test
+      - run: npm run docs:build
       - name: Test packed package (smoke)
         run: |
           npm pack

@@ -1,5 +1,9 @@
 node_modules/
 dist/
+
+# VitePress docs site (website/) — generated locally and in CI; do not commit
+website/.vitepress/cache/
+website/.vitepress/dist/
 *.log
 .DS_Store
 .env

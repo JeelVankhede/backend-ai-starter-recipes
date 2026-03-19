@@ -13,8 +13,9 @@ Fork the repo, branch from `main`, then open a **Pull Request** against `main`.
 ## Before you open a PR
 
 1. Run **`npm run build`** and ensure it succeeds.
-2. If you change user-facing behavior, update **README.md** as needed.
-3. Add or extend **JSDoc** on exported functions and non-obvious logic in `src/`.
+2. If you touch **`website/`**, run **`npm run docs:build`** (also runs in CI).
+3. If you change user-facing behavior, update **README.md** as needed.
+4. Add or extend **JSDoc** on exported functions and non-obvious logic in `src/`.
 
 ## Commit messages
 
