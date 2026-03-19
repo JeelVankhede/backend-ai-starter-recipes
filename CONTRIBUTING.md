@@ -39,16 +39,50 @@ Only people with **Write** (or **Maintain**) access can merge; keep that list sm
 
 Releases are **manual only**: no automatic publish on push or tag.
 
-1. **Run the release workflow:** Actions → **Release** → **Run workflow**. Choose **bump** (`patch` / `minor` / `major`). The workflow will:
-   - Run `npm ci`, build, and tests (same as CI).
-   - Bump `package.json` version (no tag yet).
-   - Commit the version bump to `main`, create an annotated tag `vX.Y.Z`, publish to npm, push commit and tag, then create a GitHub Release with generated notes.
+CI publishes with **[npm Trusted Publishing (OIDC)](https://docs.npmjs.com/trusted-publishers)** — **no `NPM_TOKEN`** in GitHub.
 
-2. **Required secret:** In **Settings → Secrets and variables → Actions**, add **`NPM_TOKEN`**:
-   - **npm:** [Access Tokens](https://www.npmjs.com/) → **Generate New Token** → use a **Granular Access Token** with **Read and write** for package `backend-ai-starter-recipes`, or a classic **Automation** token (for 2FA-friendly publish from CI).
-   - Paste the token value into the repo secret named `NPM_TOKEN`.
+### One-time: npm ↔ GitHub
 
-3. **Optional:** Add a GitHub **Environment** (e.g. `production`) for the release job and set required reviewers so only selected people can run the workflow.
+1. **Package must exist on npm** under your account (so it has a **Settings** page). If the name is new, create it once (e.g. `npm publish` from your machine while logged in, or any flow npm documents for claiming the name).
+2. Open **[npm](https://www.npmjs.com/)** → **Packages** → **`backend-ai-starter-recipes`** → **Settings** → **Trusted publishing** (or **Trusted Publisher**).
+3. Choose **GitHub Actions** and set fields to match **exactly** (case-sensitive):
+   - **Repository:** `JeelVankhede/backend-ai-starter-recipes` (or your `owner/repo`).
+   - **Workflow filename:** `release.yml` — must match the file under `.github/workflows/` (include `.yml`).
+   - **Environment (optional):** only if you use a GitHub [environment](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment) for the release job; the name must match what you configure on GitHub **and** on npm.
+4. Save on npm. npm does **not** validate the link until a real publish runs.
+
+### What the workflow already does
+
+- `permissions: id-token: write` (GitHub OIDC).
+- **GitHub-hosted** `ubuntu-latest` (self-hosted runners are **not** supported for npm OIDC today).
+- **Node 24** + **npm ≥ 11.5.1** before `npm publish` (required by [npm docs](https://docs.npmjs.com/trusted-publishers)).
+- No `NODE_AUTH_TOKEN` / `NPM_TOKEN` on the publish step.
+
+### How to verify the setup (before relying on it)
+
+| Check | How |
+|--------|-----|
+| Workflow file name | On GitHub: `.github/workflows/release.yml` exists; on npm trusted publisher the filename is **`release.yml`** (not `release.yaml` unless you rename the file). |
+| OIDC permission | In the workflow YAML, the `release` job includes `permissions: id-token: write`. |
+| Runner | Workflow uses `runs-on: ubuntu-latest` (hosted). |
+| npm / Node versions | In a failing run, expand **Use npm CLI with trusted publishing support** — `npm --version` should be **≥ 11.5.1**. |
+| Repository visibility | **Public** repo is required if you want [provenance](https://docs.npmjs.com/generating-provenance-statements) (OIDC publish still works for public packages from a public repo). |
+| Optional environment | If npm asks for a GitHub **Environment**, add to the `release` job: `environment: production` (example), create that environment on GitHub, and use the **same** name on npm. |
+
+### After you think it’s configured
+
+1. Run **Actions → Release → Run workflow** (e.g. bump `patch`).
+2. If publish fails with **Unable to authenticate** / OIDC errors: re-check the table above; typos in **owner/repo** or **`release.yml`** are the usual cause.
+3. **Do not use `npm whoami` in CI to test OIDC** — npm only exchanges the OIDC token during **`npm publish`**; `whoami` does not reflect trusted publishing ([npm docs](https://docs.npmjs.com/trusted-publishers#troubleshooting)).
+
+### Optional hardening
+
+- Add a GitHub **Environment** (e.g. `production`) on the `release` job and require approvers so only maintainers can run the workflow.
+- After OIDC works, consider **Settings → Publishing access** on the package to restrict classic token publishing ([npm guidance](https://docs.npmjs.com/trusted-publishers)).
+
+### Private npm dependencies
+
+Trusted publishing only covers **`npm publish`**. If the package ever needs **private** `@scope` dependencies, use a **read-only** granular token **only** for `npm ci` (not for publish). This repo’s dependencies are public, so no token is needed for install.
 
 ## Questions
 
