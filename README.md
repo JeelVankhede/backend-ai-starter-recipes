@@ -71,7 +71,7 @@ npm run test:coverage
 ## Repository & contributing
 
 - Source: [github.com/JeelVankhede/backend-ai-starter-recipes](https://github.com/JeelVankhede/backend-ai-starter-recipes)
-- See [CONTRIBUTING.md](CONTRIBUTING.md) for branches and PRs.
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for branches, PRs, branch protection, and **release process** (manual workflow + `NPM_TOKEN`).
 
 ## Security
 
