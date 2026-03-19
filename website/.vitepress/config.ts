@@ -18,6 +18,10 @@ export default withMermaid(
         { text: 'Guide', link: '/guide/1-the-problem', activeMatch: '/guide/' },
         { text: 'Community', link: '/community/contributing' },
         {
+          text: 'Wiki',
+          link: 'https://github.com/JeelVankhede/backend-ai-starter-recipes/wiki',
+        },
+        {
           text: 'GitHub',
           link: 'https://github.com/JeelVankhede/backend-ai-starter-recipes',
         },

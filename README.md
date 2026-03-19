@@ -36,8 +36,6 @@ Full walkthrough (problem → architecture → install → usage → output → 
 
 **[jeelvankhede.github.io/backend-ai-starter-recipes](https://jeelvankhede.github.io/backend-ai-starter-recipes/)**
 
-To publish from this repo, enable **Settings → Pages → Build and deployment → Source: GitHub Actions** (the `Docs` workflow uploads the VitePress build).
-
 ## Non-interactive presets
 
 ```bash
