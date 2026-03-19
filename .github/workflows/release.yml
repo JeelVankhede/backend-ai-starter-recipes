@@ -36,6 +36,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          token: ${{ secrets.RELEASE_PUSH_TOKEN || github.token }}
 
       # No registry-url: setup-node would inject placeholder NODE_AUTH_TOKEN and break OIDC.
       - name: Setup Node
@@ -80,4 +81,4 @@ jobs:
       - name: Create GitHub Release
         run: gh release create "v${{ steps.version.outputs.version }}" --title "v${{ steps.version.outputs.version }}" --generate-notes
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_PUSH_TOKEN || github.token }}
