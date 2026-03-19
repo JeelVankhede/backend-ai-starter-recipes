@@ -56,7 +56,8 @@ CI publishes with **[npm Trusted Publishing (OIDC)](https://docs.npmjs.com/trust
 - `permissions: id-token: write` (GitHub OIDC).
 - **GitHub-hosted** `ubuntu-latest` (self-hosted runners are **not** supported for npm OIDC today).
 - **Node 24** + **npm ≥ 11.5.1** before `npm publish` (required by [npm docs](https://docs.npmjs.com/trusted-publishers)).
-- No `NODE_AUTH_TOKEN` / `NPM_TOKEN` on the publish step.
+- **`actions/setup-node` without `registry-url`** — if you set `registry-url: https://registry.npmjs.org`, `setup-node` writes a temp `.npmrc` with `_authToken=${NODE_AUTH_TOKEN}` and, when no secret is provided, sets `NODE_AUTH_TOKEN` to the literal placeholder `XXXXX-XXXXX-XXXXX-XXXXX`. npm then **never uses OIDC** and publish fails with **E404**. The default registry is already `registry.npmjs.org`, so omit `registry-url` for OIDC-only publish.
+- The publish step **unsets** `NODE_AUTH_TOKEN` / `NPM_CONFIG_USERCONFIG` so no stale auth leaks in.
 
 ### How to verify the setup (before relying on it)
 
