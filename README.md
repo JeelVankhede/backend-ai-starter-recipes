@@ -30,6 +30,14 @@ Both commands accept the same flags (`--output`, `--preset`, etc.).
 
 Answer the prompts to define your framework, ORM, validation, auth, testing, and target IDEs. The CLI writes a canonical `.ai/` directory and IDE-specific files (**Cursor**, **Claude Code**, **VS Code Copilot**, **Antigravity**, **Windsurf**).
 
+## Documentation
+
+Full walkthrough (problem → architecture → install → usage → output → workflow) and community guide:
+
+**[jeelvankhede.github.io/backend-ai-starter-recipes](https://jeelvankhede.github.io/backend-ai-starter-recipes/)**
+
+To publish from this repo, enable **Settings → Pages → Build and deployment → Source: GitHub Actions** (the `Docs` workflow uploads the VitePress build).
+
 ## Non-interactive presets
 
 ```bash
