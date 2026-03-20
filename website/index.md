@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: BARE
+  name: <span class="decorate">B</span>ackend-<span class="decorate">A</span>i-starter-<span class="decorate">RE</span>cipes
   text: Stop repeating yourself to AI
   tagline: Generate opinionated rules, skills, and context so your agent already knows your stack — npm package backend-ai-starter-recipes, CLI bare.
   actions:
