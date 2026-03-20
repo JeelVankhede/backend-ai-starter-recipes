@@ -20,6 +20,27 @@
   max-width: 52rem;
 }
 
+.VPHome .VPHero .heading {
+  .name.clip {
+    font-weight: normal;
+    color: var(--vp-c-text-1) !important;
+    max-width: 100% !important;
+  }
+
+  .clip {
+    -webkit-text-fill-color: inherit !important;
+  }
+
+  .text {
+    font-style: italic !important;
+  } 
+
+  .decorate {
+    font-weight: bold !important;
+    color: var(--vp-home-hero-name-color);
+  }
+}
+
 /* --------------------------------------------------------------------------
    Motion — subtle animations (respects prefers-reduced-motion)
    -------------------------------------------------------------------------- */
@@ -29,6 +50,7 @@
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -39,12 +61,14 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
+
   /* Home: hero enters first */
   .VPHome .VPHero {
     animation: bare-fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -54,12 +78,15 @@
   .VPHome .VPFeatures .VPFeature:nth-child(1) {
     animation: bare-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
   }
+
   .VPHome .VPFeatures .VPFeature:nth-child(2) {
     animation: bare-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
   }
+
   .VPHome .VPFeatures .VPFeature:nth-child(3) {
     animation: bare-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
   }
+
   .VPHome .VPFeatures .VPFeature:nth-child(n + 4) {
     animation: bare-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
   }
@@ -80,6 +107,7 @@
       transform 0.2s ease,
       box-shadow 0.25s ease;
   }
+
   .VPHero .actions .VPButton.brand:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px var(--vp-c-brand-soft);
@@ -92,6 +120,7 @@
       box-shadow 0.25s ease,
       border-color 0.25s ease;
   }
+
   .VPHome .VPFeature:hover {
     transform: translateY(-4px);
   }
@@ -100,6 +129,7 @@
   .VPNavBarTitle .logo {
     transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
+
   .VPNavBarTitle:hover .logo {
     transform: scale(1.06) rotate(-3deg);
   }
@@ -113,6 +143,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .VPHome .VPHero,
   .VPHome .VPFeatures .VPFeature,
   .VPContent .vp-doc {
