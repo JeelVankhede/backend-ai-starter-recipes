@@ -6,6 +6,8 @@ description: Specialized migration safety review
 
 Use this skill whenever a database migration file or schema definition is modified.
 
+Use `.ai/lifecycle/plan.md`, `.ai/lifecycle/review.md`, `.ai/lifecycle/test.md`, and `.ai/lifecycle/ship.md` for migration planning, validation, and rollout notes.
+
 ## Data Layer Architecture
 ORM: {{orm}}
 
@@ -16,6 +18,8 @@ ORM: {{orm}}
 3. **Rollback:** Can this migration be safely reverted? Is the `down` script implemented properly (if applicable for {{orm}})?
 4. **Data Integrity:** Are primary keys, foreign keys, and unique constraints applied correctly?
 5. **Types:** Are appropriate data types used (e.g., BigInt/Decimal for monetary values, UUID for IDs)?
+6. **Deployment Compatibility:** Can old and new application versions tolerate the schema during rollout?
+7. **Validation:** Are migration up/down, backfill, and data-access checks listed?
 
 ## Report
-If any anomalies are detected, block the PR and request changes.
+If any anomalies are detected, block the PR and request changes. Include migration risk, compatibility notes, rollback/remediation plan, validation checks, and release blockers.

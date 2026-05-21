@@ -1,5 +1,7 @@
 # Async & Background Processing
 
+Use this rule with `.ai/lifecycle/plan.md`, `.ai/lifecycle/build.md`, `.ai/lifecycle/review.md`, and `.ai/lifecycle/test.md`.
+
 ## Queues & Background Jobs
 - Do not perform heavy, non-blocking I/O tasks within the synchronous HTTP request-response cycle (e.g., sending emails, generating PDFs, resizing images).
 - Offload these tasks to a background queue system (e.g. BullMQ, RabbitMQ, SQS).
@@ -20,3 +22,23 @@
 ## Cron & Scheduled Tasks
 - Do not run scheduled tasks directly in the main web server pool if scaling horizontally (this prevents the job from running N times on N servers).
 - Use a distributed locking mechanism or a dedicated worker tier for cron jobs.
+
+## Reliability Requirements
+
+- Name queue/topic, payload shape, retry policy, idempotency key, and failure visibility.
+- Keep payloads small and fetch current state in processors when possible.
+- Make duplicate delivery and retry behavior safe by design.
+- Include observability for started, completed, retried, and failed jobs.
+
+## Must Avoid
+
+- Fire-and-forget work with no retry, DLQ, or log visibility.
+- Large or sensitive payloads in queues.
+- Non-idempotent processors for retryable jobs.
+- Cron jobs that run once per app instance in horizontally scaled deployments.
+
+## Acceptance Criteria
+
+- Async contract, retry policy, and idempotency behavior are explicit.
+- Failure and DLQ behavior are observable.
+- Tests or manual checks cover retry, duplicate, and failure paths where material.

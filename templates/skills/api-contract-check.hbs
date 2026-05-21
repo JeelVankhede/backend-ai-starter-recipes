@@ -6,6 +6,8 @@ description: Detects breaking changes in API contracts
 
 Use this skill when API controllers, routers, or DTO/validation schemas are modified.
 
+Use `.ai/lifecycle/review.md`, `.ai/lifecycle/test.md`, and `.ai/lifecycle/ship.md` before release.
+
 ## Objective
 Ensure we do not break backward compatibility for client applications without bumping the API version.
 
@@ -15,6 +17,8 @@ Ensure we do not break backward compatibility for client applications without bu
    - Response DTOs / Payloads (e.g., fields removed, renamed, or types changed).
    - Route definitions (e.g., paths changed, parameters removed).
 2. If {{#if hasSwagger}}Swagger definitions{{else}}API Docs{{/if}} are present, ensure they accurately reflect the changes.
+3. Check status codes, auth requirements, pagination/envelope behavior, and error shape.
+4. List tests and release notes needed for any compatibility risk.
 
 ## Output
-Produce a report detailing any breaking changes. If a change is breaking, suggest either reverting it or bumping the application API version.
+Produce a report detailing request/response changes, compatibility risk, required tests, docs updates, and release notes. If a change is breaking, suggest either reverting it or bumping the application API version.

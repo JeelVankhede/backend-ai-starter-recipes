@@ -13,8 +13,9 @@ Welcome to the **{{projectName}}** codebase! This is a {{framework}} service wri
 
 1. **Be concise:** No pleasantries. Skip to the code.
 2. **Read first, write second:** Always view the relevant file contents and grep for existing patterns before authoring new code.
-3. **Plan-first approach:** For complex logic, propose a brief implementation plan before modifying files.
-4. **Follow conventions:** If a pattern exists in the codebase (e.g., how we handle {{#if hasAuth}}auth, {{/if}}errors, {{#if hasPrisma}}Prisma, {{/if}}etc.), match it perfectly. Do not spontaneously introduce new libraries or alternate patterns.
+3. **Use the lifecycle:** Follow `.ai/lifecycle/think.md`, `plan.md`, `build.md`, `review.md`, `test.md`, `ship.md`, and `reflect.md` for non-trivial work.
+4. **Plan-first approach:** For API, data, migration, auth, integration, async, or operational changes, outline contracts, data impact, risks, rollout, rollback, and tests before implementation.
+5. **Follow conventions:** If a pattern exists in the codebase (e.g., how we handle {{#if hasAuth}}auth, {{/if}}errors, {{#if hasPrisma}}Prisma, {{/if}}etc.), match it perfectly. Do not spontaneously introduce new libraries or alternate patterns.
 
 ## Tech Stack Overview
 
@@ -34,6 +35,24 @@ Welcome to the **{{projectName}}** codebase! This is a {{framework}} service wri
 {{/if}}
 
 For detailed architectural maps, see `.ai/context/domain-map.md`.
+
+## Lifecycle Contract
+
+- **Think:** inspect routes/controllers, services, data models, migrations, auth, integrations, async jobs, logs, and tests before proposing work.
+- **Plan:** name affected contracts, data boundaries, auth/security impact, integration behavior, risks, rollback, and validation steps.
+- **Build:** implement only the approved backend scope; avoid unrelated rewrites and speculative abstractions.
+- **Review:** check correctness, API compatibility, data integrity, security, observability, failure modes, and adapter output.
+- **Test:** run or define unit, integration, contract, migration, smoke, and manual checks proportional to risk.
+- **Ship:** summarize behavior, validation, release notes, breaking changes, and rollback/remediation concerns.
+- **Reflect:** capture backend template gaps, repeated issues, and follow-up tasks.
+
+## Must Avoid
+
+- Runtime references to `engineering-research-repo`.
+- Silent public API, schema, auth, authorization, or persistence changes.
+- Destructive migrations without explicit approval and rollback/remediation notes.
+- New dependencies or architecture layers without explicit approval.
+- Claims that tests, migration checks, smoke checks, or adapter checks passed without evidence.
 
 ## Quality Gates
 

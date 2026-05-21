@@ -12,6 +12,13 @@ import { generateAntigravity } from '../src/adapters/antigravity.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+function expectCursorGlobs(content: string, patterns: string[]) {
+  expect(content).toContain(
+    ['globs:', ...patterns.map((pattern) => `  - ${JSON.stringify(pattern)}`)].join('\n'),
+  );
+  expect(content).not.toContain('globs: "');
+}
+
 describe('adapter error and branch paths', () => {
   beforeEach(() => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -60,6 +67,17 @@ describe('adapter error and branch paths', () => {
     expect(md).toMatch(/Agent only/);
   });
 
+  it('generateVsCodeCopilot includes lifecycle content when present', async () => {
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-copilot-life-'));
+    await fs.mkdir(path.join(tmp, '.ai', 'lifecycle'), { recursive: true });
+    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# Agent');
+    await fs.writeFile(path.join(tmp, '.ai', 'lifecycle', 'think.md'), '# Think life');
+    const writer = new FileWriter(tmp);
+    await generateVsCodeCopilot(tmp, writer);
+    const md = await fs.readFile(path.join(tmp, '.github', 'copilot-instructions.md'), 'utf-8');
+    expect(md).toMatch(/Think life/);
+  });
+
   it('generateWindsurf succeeds with AGENT only', async () => {
     const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-wind-agent-'));
     await fs.mkdir(path.join(tmp, '.ai'), { recursive: true });
@@ -99,6 +117,19 @@ describe('adapter error and branch paths', () => {
     );
   });
 
+  it('generateCursor writes lifecycle rule when lifecycle content exists', async () => {
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-cur-life-'));
+    await fs.mkdir(path.join(tmp, '.ai', 'rules'), { recursive: true });
+    await fs.mkdir(path.join(tmp, '.ai', 'lifecycle'), { recursive: true });
+    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# A');
+    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'x.md'), '# R');
+    await fs.writeFile(path.join(tmp, '.ai', 'lifecycle', 'plan.md'), '# Plan life');
+    const writer = new FileWriter(tmp);
+    await generateCursor(tmp, writer);
+    const lifecycle = await fs.readFile(path.join(tmp, '.cursor/rules/lifecycle.mdc'), 'utf-8');
+    expect(lifecycle).toMatch(/Plan life/);
+  });
+
   it('generateCursor api-patterns and external-integrations globs', async () => {
     const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-cur-glob-'));
     await fs.mkdir(path.join(tmp, '.ai', 'rules'), { recursive: true });
@@ -111,11 +142,13 @@ describe('adapter error and branch paths', () => {
     const writer = new FileWriter(tmp);
     await generateCursor(tmp, writer);
     const api = await fs.readFile(path.join(tmp, '.cursor/rules/api-patterns.mdc'), 'utf-8');
+    expectCursorGlobs(api, ['**/*.dto.ts', '**/*.controller.ts', '**/*.route.ts']);
     expect(api).toMatch(/\.controller\.ts/);
     const ext = await fs.readFile(
       path.join(tmp, '.cursor/rules/external-integrations.mdc'),
       'utf-8',
     );
+    expectCursorGlobs(ext, ['src/external/**/*.ts']);
     expect(ext).toMatch(/src\/external/);
   });
 

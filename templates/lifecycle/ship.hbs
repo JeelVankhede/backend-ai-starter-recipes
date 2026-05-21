@@ -1,0 +1,45 @@
+---
+description: Prepare backend work for handoff, release, and rollback
+---
+
+# Ship
+
+## Stage Goal
+
+Prepare approved backend work for release or handoff with validation notes, release notes, compatibility impact, and rollback concerns.
+
+## Inputs Needed
+
+- Final diff or artifact list.
+- Test output.
+- Known limitations.
+- Migration plan if templates move into Bare.
+- Adapter output review when generated files changed.
+
+## AI Behavior Expected
+
+- Summarize behavior delivered.
+- Summarize validation commands and results.
+- Call out public API changes, data/migration changes, auth/security changes, output path changes, and breaking changes.
+- Draft release notes when relevant.
+- Identify rollback or remediation steps.
+- Record source mapping only after actual Bare release.
+
+## AI Behavior Forbidden
+
+- Claiming release readiness while blockers remain.
+- Omitting known limitations.
+- Marking engineering repo templates as shipped before Bare release.
+- Skipping adapter review for generated-output changes.
+
+## Output Expected
+
+- Change summary.
+- Validation notes.
+- Release notes draft.
+- Breaking-change and compatibility callout.
+- Rollback/remediation notes.
+
+## Quality Bar
+
+Ship is complete when reviewers can see what changed, how it was validated, what risks remain, and how to recover if needed.

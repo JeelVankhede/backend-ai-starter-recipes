@@ -1,5 +1,7 @@
 # Testing Guidelines
 
+Use this rule with `.ai/lifecycle/plan.md`, `.ai/lifecycle/test.md`, and `.ai/lifecycle/ship.md`.
+
 ## Framework
 This project uses **{{testFramework}}** for testing.
 
@@ -30,3 +32,23 @@ This project uses **{{testFramework}}** for testing.
 ## JSDoc and Documentation
 - Clearly comment complex test setups.
 - Use the `Arrange, Act, Assert` pattern in every test block.
+
+## Lifecycle Expectations
+
+- Plan tests before implementation for non-trivial backend changes.
+- Use targeted checks for narrow changes, then broaden when public APIs, data, auth, integrations, async behavior, or generated output changes.
+- Include manual QA when automation does not cover migrations, provider behavior, deployment order, or adapter output.
+
+## Must Avoid
+
+- Unit-only validation for public contract, migration, auth, or integration changes.
+- Skipping validation failure, auth denial, not-found, provider failure, retry, and duplicate-delivery paths when relevant.
+- Tests that assert implementation details instead of observable behavior.
+- Claiming adapter or generated-output checks passed without inspecting generated files.
+
+## Acceptance Criteria
+
+- Tests match backend risk and changed behavior.
+- Success and material failure paths are covered.
+- Skipped or missing checks are called out.
+- Build, unit/integration/e2e, migration, smoke, and manual checks are recorded when relevant.

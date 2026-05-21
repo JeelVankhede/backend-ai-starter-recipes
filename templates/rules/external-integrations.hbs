@@ -1,5 +1,7 @@
 # External Integrations
 
+Use this rule with `.ai/lifecycle/think.md`, `.ai/lifecycle/plan.md`, `.ai/lifecycle/build.md`, `.ai/lifecycle/review.md`, and `.ai/lifecycle/test.md`.
+
 Any code that calls a 3rd party API (e.g., Stripe, SendGrid, Twilio, AWS) must be cleanly abstracted.
 
 ## Wrapper Service Pattern
@@ -25,3 +27,24 @@ Any code that calls a 3rd party API (e.g., Stripe, SendGrid, Twilio, AWS) must b
 ## Webhooks
 - Webhooks must verify cryptographic signatures provided by the 3rd party.
 - Offload heavy processing from webhook endpoints to background queues immediately after verification.
+
+## Contract And Failure Rules
+
+- Name the provider contract, timeout, retry, idempotency, and rate-limit behavior.
+- Persist provider identifiers and idempotency keys when needed for reconciliation.
+- Map provider failures to domain errors before returning to clients.
+- Log provider context safely with correlation IDs.
+
+## Must Avoid
+
+- Direct provider calls from controllers/handlers or unrelated services.
+- Retrying non-idempotent operations blindly.
+- Assuming providers always return complete or valid data.
+- Logging webhook secrets, access tokens, or full provider payloads by default.
+
+## Acceptance Criteria
+
+- External contract and failure modes are named.
+- Timeout, retry, idempotency, and observability behavior are defined.
+- Webhook verification and duplicate-delivery handling are checked where relevant.
+- Success and provider-failure paths have tests or manual checks.
