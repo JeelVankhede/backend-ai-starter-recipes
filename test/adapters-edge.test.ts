@@ -12,6 +12,13 @@ import { generateAntigravity } from '../src/adapters/antigravity.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+function expectCursorGlobs(content: string, patterns: string[]) {
+  expect(content).toContain(
+    ['globs:', ...patterns.map((pattern) => `  - ${JSON.stringify(pattern)}`)].join('\n'),
+  );
+  expect(content).not.toContain('globs: "');
+}
+
 describe('adapter error and branch paths', () => {
   beforeEach(() => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -135,13 +142,13 @@ describe('adapter error and branch paths', () => {
     const writer = new FileWriter(tmp);
     await generateCursor(tmp, writer);
     const api = await fs.readFile(path.join(tmp, '.cursor/rules/api-patterns.mdc'), 'utf-8');
-    expect(api).toContain('globs: "**/*.dto.ts,**/*.controller.ts,**/*.route.ts"');
+    expectCursorGlobs(api, ['**/*.dto.ts', '**/*.controller.ts', '**/*.route.ts']);
     expect(api).toMatch(/\.controller\.ts/);
     const ext = await fs.readFile(
       path.join(tmp, '.cursor/rules/external-integrations.mdc'),
       'utf-8',
     );
-    expect(ext).toContain('globs: "src/external/**/*.ts"');
+    expectCursorGlobs(ext, ['src/external/**/*.ts']);
     expect(ext).toMatch(/src\/external/);
   });
 

@@ -17,6 +17,13 @@ async function seedMinimalAi(targetDir: string) {
   await fs.cp(fixtureAi, path.join(targetDir, '.ai'), { recursive: true });
 }
 
+function expectCursorGlobs(content: string, patterns: string[]) {
+  expect(content).toContain(
+    ['globs:', ...patterns.map((pattern) => `  - ${JSON.stringify(pattern)}`)].join('\n'),
+  );
+  expect(content).not.toContain('globs: "');
+}
+
 describe('IDE adapters', () => {
   let tmp: string;
 
@@ -37,10 +44,15 @@ describe('IDE adapters', () => {
       'utf-8',
     );
     expect(dataLayer).toMatch(/globs:/);
-    expect(dataLayer).toContain('globs: "prisma/**/*,**/*.repository.ts,**/*.entity.ts,src/db/**/*"');
+    expectCursorGlobs(dataLayer, [
+      'prisma/**/*',
+      '**/*.repository.ts',
+      '**/*.entity.ts',
+      'src/db/**/*',
+    ]);
     expect(dataLayer).toMatch(/prisma/);
     const testing = await fs.readFile(path.join(tmp, '.cursor/rules/testing.mdc'), 'utf-8');
-    expect(testing).toContain('globs: "**/*.spec.ts,**/*.e2e-spec.ts,**/*.test.ts"');
+    expectCursorGlobs(testing, ['**/*.spec.ts', '**/*.e2e-spec.ts', '**/*.test.ts']);
     expect(testing).toMatch(/\.spec\.ts/);
     const lifecycle = await fs.readFile(path.join(tmp, '.cursor/rules/lifecycle.mdc'), 'utf-8');
     expect(lifecycle).toMatch(/Lifecycle fixture think/);
