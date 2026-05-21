@@ -1,5 +1,9 @@
 # API Validation & Patterns
 
+Use this rule with `.ai/lifecycle/think.md`, `.ai/lifecycle/plan.md`, `.ai/lifecycle/build.md`, `.ai/lifecycle/review.md`, and `.ai/lifecycle/test.md`.
+
+Before changing an endpoint, identify request shape, response shape, status codes, validation, auth requirements, error behavior, versioning impact, and tests.
+
 {{#if (eq validation "class-validator")}}
 ## Request Validation
 - Use `class-validator` and `class-transformer` on all DTOs.
@@ -51,3 +55,24 @@
 ## API Versioning
 - Use URI versioning (e.g. `/v1/users`) for all endpoints.
 - When introducing breaking changes, bump the version rather than mutating existing contracts.
+
+## Contract Rules
+
+- Treat DTOs, schemas, response envelopes, status codes, pagination, and error bodies as contracts.
+- Preserve existing fields and semantics unless the plan explicitly approves a breaking change.
+- Add compatibility notes and release notes for any public contract change.
+- Keep generated docs and tests aligned with implementation.
+
+## Must Avoid
+
+- Silent response shape or status-code changes.
+- Validation gaps on body, query, params, headers, or file inputs.
+- Returning raw domain, database, or provider errors to clients.
+- Adding public endpoints without auth and rate-limit review.
+
+## Acceptance Criteria
+
+- Success and failure contracts are explicit.
+- Validation, auth, and error behavior are defined.
+- Compatibility risk is named.
+- Tests cover success, validation failure, auth failure, and not-found/error paths where relevant.

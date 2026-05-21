@@ -37,9 +37,14 @@ describe('IDE adapters', () => {
       'utf-8',
     );
     expect(dataLayer).toMatch(/globs:/);
+    expect(dataLayer).toContain('globs: "prisma/**/*,**/*.repository.ts,**/*.entity.ts,src/db/**/*"');
     expect(dataLayer).toMatch(/prisma/);
     const testing = await fs.readFile(path.join(tmp, '.cursor/rules/testing.mdc'), 'utf-8');
+    expect(testing).toContain('globs: "**/*.spec.ts,**/*.e2e-spec.ts,**/*.test.ts"');
     expect(testing).toMatch(/\.spec\.ts/);
+    const lifecycle = await fs.readFile(path.join(tmp, '.cursor/rules/lifecycle.mdc'), 'utf-8');
+    expect(lifecycle).toMatch(/Lifecycle fixture think/);
+    expect(lifecycle).toMatch(/Lifecycle fixture reflect/);
   });
 
   it('generateClaudeCode writes CLAUDE.md', async () => {
@@ -47,6 +52,7 @@ describe('IDE adapters', () => {
     await generateClaudeCode(tmp, writer);
     const claude = await fs.readFile(path.join(tmp, 'CLAUDE.md'), 'utf-8');
     expect(claude).toMatch(/Test Agent/);
+    expect(claude).toMatch(/Lifecycle fixture think/);
     expect(claude).toMatch(/Architecture rule/);
   });
 
@@ -58,6 +64,7 @@ describe('IDE adapters', () => {
       'utf-8',
     );
     expect(copilot).toMatch(/Test Agent/);
+    expect(copilot).toMatch(/Lifecycle fixture plan/);
   });
 
   it('generateWindsurf writes .windsurfrules', async () => {
@@ -65,6 +72,7 @@ describe('IDE adapters', () => {
     await generateWindsurf(tmp, writer);
     const rules = await fs.readFile(path.join(tmp, '.windsurfrules'), 'utf-8');
     expect(rules).toMatch(/Test Agent/);
+    expect(rules).toMatch(/Lifecycle fixture review/);
   });
 
   it('generateAntigravity writes workflow from SKILL.md', async () => {

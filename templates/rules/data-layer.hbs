@@ -1,5 +1,9 @@
 # Data Layer ({{orm}})
 
+Use this rule with `.ai/lifecycle/plan.md`, `.ai/lifecycle/build.md`, `.ai/lifecycle/review.md`, `.ai/lifecycle/test.md`, and `.ai/lifecycle/ship.md`.
+
+Before changing persistence, identify data model impact, query ownership, migration risk, deployment order, rollback/remediation path, and tests.
+
 ## Repository Pattern
 {{> repositoryPattern }}
 
@@ -36,6 +40,22 @@
 - **NEVER** edit an existing migration file that has already been merged or applied in production. Always create a new one.
 - Keep migration names highly descriptive (e.g. `add_status_to_users_table`).
 - Always test migrations up and down locally before committing.
+- Name destructive, irreversible, or large backfill operations before implementation.
+- Keep application code compatible during deploys when a migration and app rollout may overlap.
 
 ## Data Seeding
 Use the project's seeding strategy (if provided) to populate lookups and initial admin states for development and testing. Do not rely on ad-hoc SQL inserts during setup.
+
+## Must Avoid
+
+- Dropping, renaming, or transforming data without explicit approval.
+- Editing applied migrations.
+- Bypassing repositories or transaction boundaries when conventions exist.
+- Persisting sensitive values without encryption, hashing, or masking requirements.
+
+## Acceptance Criteria
+
+- Data impact and migration risk are named.
+- Rollback or remediation path is documented.
+- Query paths, constraints, indexes, and transactions are reviewed.
+- Migration and data-access tests or manual checks are listed.

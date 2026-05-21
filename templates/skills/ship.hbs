@@ -11,6 +11,7 @@ This skill automates the process of landing code safely.
 1. **Pre-flight Checks**
    {{> buildCommands }}
    {{> testCommands }}
+   - Check `.ai/lifecycle/ship.md` for summary, validation, release notes, and rollback expectations.
 
 2. **Git Status Check**
    - Ensure you are on a feature branch.
@@ -23,5 +24,15 @@ This skill automates the process of landing code safely.
 
 4. **Pull Request**
    - If user confirms, run the CLI tool (e.g. `gh pr create`) to open a PR.
+   - Include API contract, data/migration, auth/security, integration, async, and adapter-output notes where relevant.
+   - Include rollback or remediation notes for risky backend behavior.
 
 {{> gitRules }}
+
+## PR Notes
+
+- Summary of behavior delivered.
+- Validation commands and results.
+- Breaking changes or compatibility notes.
+- Rollout, rollback, or remediation notes.
+- Known limitations or follow-up tasks.

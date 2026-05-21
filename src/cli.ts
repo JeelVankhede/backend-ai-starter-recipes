@@ -32,6 +32,8 @@ const packageRootDir = path.resolve(__dirname, '..');
 /** Filename for skill definition; use constant so build never emits bare SKILL identifier. */
 const SKILL_FILENAME = 'SKILL.md' as const;
 
+const LIFECYCLE_FILES = ['think', 'plan', 'build', 'review', 'test', 'ship', 'reflect'] as const;
+
 const program = new Command();
 
 program
@@ -137,7 +139,12 @@ async function run() {
     // 1. Agent
     await writer.write('.ai/AGENT.md', await engine.render('agent.hbs', context));
 
-    // 2. Rules
+    // 2. Lifecycle
+    for (const stage of LIFECYCLE_FILES) {
+      await writer.write(`.ai/lifecycle/${stage}.md`, await engine.render(`lifecycle/${stage}.hbs`, context));
+    }
+
+    // 3. Rules
     const rules = [
       'architecture',
       'api-patterns',
@@ -156,7 +163,7 @@ async function run() {
       await writer.write('.ai/rules/data-layer.md', await engine.render('rules/data-layer.hbs', context));
     }
 
-    // 3. Skills
+    // 4. Skills
     if (context.skills.includes('plan-review')) {
       await writer.write(`.ai/skills/plan-review/${SKILL_FILENAME}`, await engine.render('skills/plan-review.hbs', context));
     }
@@ -186,7 +193,7 @@ async function run() {
       await writer.write(`.ai/skills/dependency-audit/${SKILL_FILENAME}`, await engine.render('skills/dependency-audit.hbs', context));
     }
 
-    // 4. Context & Tracking
+    // 5. Context & Tracking
     await writer.write('.ai/context/domain-map.md', await engine.render('context/domain-map.hbs', context));
     await writer.write('.ai/context/tech-stack.md', await engine.render('context/tech-stack.hbs', context));
     await writer.write('.ai/tracking/efficiency.md', await engine.render('tracking/efficiency.hbs', context));

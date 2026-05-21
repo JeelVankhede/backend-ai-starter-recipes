@@ -6,6 +6,8 @@ description: Systematic API quality testing
 
 This skill acts as your QA Engineer, systematically validating endpoints.
 
+Use `.ai/lifecycle/test.md` to choose checks proportional to the changed backend risk.
+
 ## Process
 
 1. **Static Analysis**
@@ -21,6 +23,22 @@ This skill acts as your QA Engineer, systematically validating endpoints.
    - Verify Swagger documentation matches the implementation.
    {{/if}}
    - Check error handling by sending invalid payloads.
+   - Check allowed and denied auth paths where relevant.
+   - Check not-found, conflict, rate-limit, and provider-failure paths where relevant.
+
+4. **Data / Migration Validation**
+   - For schema changes, run or define migration up/down and compatibility checks.
+   - Verify repositories, transactions, constraints, and seed behavior affected by the change.
+
+5. **Integration / Async Validation**
+   - Verify timeouts, retries, idempotency, duplicate delivery, and failed-job visibility where relevant.
+   - If `.ai/` templates changed, generate a sample project and inspect adapter output.
 
 ## Report Format
 Produce a QA Scorecard indicating passes/failures and assigning an overall Health Score (0-100%).
+
+## Output
+
+- Commands run and results.
+- Manual QA checklist.
+- Untested areas and residual risk.

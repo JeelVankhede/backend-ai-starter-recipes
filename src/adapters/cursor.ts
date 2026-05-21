@@ -6,6 +6,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import chalk from 'chalk';
 import { FileWriter } from '../writer.js';
+import { readLifecycleContent } from './lifecycle.js';
 
 /**
  * Reads generated `.ai` files and writes Cursor-specific rule files with frontmatter.
@@ -28,13 +29,27 @@ export async function generateCursor(outputDir: string, writer: FileWriter) {
       const basename = path.basename(file, '.md');
 
       let globs = '';
-      if (basename === 'data-layer') globs = 'globs: prisma/**/*,**/*.repository.ts,**/*.entity.ts,src/db/**/*';
-      else if (basename === 'api-patterns') globs = 'globs: **/*.dto.ts,**/*.controller.ts,**/*.route.ts';
-      else if (basename === 'testing') globs = 'globs: **/*.spec.ts,**/*.e2e-spec.ts,**/*.test.ts';
-      else if (basename === 'external-integrations') globs = 'globs: src/external/**/*.ts';
-      else globs = 'alwaysApply: true';
+      if (basename === 'data-layer') {
+        globs = formatGlobs(['prisma/**/*', '**/*.repository.ts', '**/*.entity.ts', 'src/db/**/*']);
+      } else if (basename === 'api-patterns') {
+        globs = formatGlobs(['**/*.dto.ts', '**/*.controller.ts', '**/*.route.ts']);
+      } else if (basename === 'testing') {
+        globs = formatGlobs(['**/*.spec.ts', '**/*.e2e-spec.ts', '**/*.test.ts']);
+      } else if (basename === 'external-integrations') {
+        globs = formatGlobs(['src/external/**/*.ts']);
+      } else {
+        globs = 'alwaysApply: true';
+      }
 
       await writer.write(`.cursor/rules/${basename}.mdc`, addFrontmatter(content, globs, basename));
+    }
+
+    const lifecycleContent = await readLifecycleContent(aiDir);
+    if (lifecycleContent.trim()) {
+      await writer.write(
+        '.cursor/rules/lifecycle.mdc',
+        addFrontmatter(lifecycleContent, 'alwaysApply: true', 'Lifecycle workflow'),
+      );
     }
 
     const skillsDir = path.join(aiDir, 'skills');
@@ -71,4 +86,11 @@ ${rule}
 ---
 
 ${content.replace(/^---\n[\s\S]*?\n---\n+/, '')}`;
+}
+
+function formatGlobs(patterns: string[]) {
+  const escapedPatterns = patterns.map((pattern) =>
+    pattern.replace(/\\/g, '\\\\').replace(/"/g, '\\"'),
+  );
+  return `globs: "${escapedPatterns.join(',')}"`;
 }

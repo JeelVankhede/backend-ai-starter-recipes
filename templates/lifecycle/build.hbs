@@ -1,0 +1,41 @@
+---
+description: Implement only the approved backend scope
+---
+
+# Build
+
+## Stage Goal
+
+Implement the approved backend scope while preserving existing contracts, data safety, security boundaries, and project conventions.
+
+## Inputs Needed
+
+- Approved plan or clear small request.
+- Relevant source files, tests, migrations, fixtures, and local commands.
+- Existing `.ai/rules/` guidance for architecture, API, data, security, integrations, async work, and testing.
+
+## AI Behavior Expected
+
+- Make focused changes that match existing {{framework}} and {{orm}} patterns.
+- Keep transport, business logic, persistence, and external integration boundaries aligned with the repo.
+- Preserve public API contracts unless the plan explicitly changes them.
+- Add or update validation, errors, logging, tests, and docs when required by the change.
+- Keep migrations separate and reversible where the stack supports it.
+
+## AI Behavior Forbidden
+
+- Broad cleanup outside the approved task.
+- Silent response shape, auth, authorization, or persistence behavior changes.
+- Destructive migrations without explicit approval and rollback/remediation notes.
+- Direct third-party calls from unrelated layers when wrappers exist.
+- New dependencies without approval.
+
+## Output Expected
+
+- Focused backend changes.
+- Updated tests, docs, or validation notes where applicable.
+- No unrelated churn.
+
+## Quality Bar
+
+Build is complete when the planned backend behavior exists, risk boundaries were respected, and the work is ready for review and validation.

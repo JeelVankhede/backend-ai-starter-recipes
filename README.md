@@ -60,6 +60,7 @@ npx backend-ai-starter-recipes --preset fastify-drizzle --output ./my-fastify-ap
 ## What gets generated?
 
 - `.ai/AGENT.md` — core AI behavior
+- `.ai/lifecycle/` — Think, Plan, Build, Review, Test, Ship, and Reflect workflow contracts
 - `.ai/rules/` — architecture, API, errors, testing, Git, etc.
 - `.ai/skills/` — workflows (plan-review, code-review, qa, ship, …)
 - `.ai/context/`, `.ai/tracking/` — reference and metrics

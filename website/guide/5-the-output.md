@@ -7,6 +7,7 @@ Everything else is derived from here. Commit `.ai/` (and your chosen IDE files) 
 ```text
 .ai/
 ├── AGENT.md                 # Core agent identity + principles + quality gates
+├── lifecycle/               # Think, Plan, Build, Review, Test, Ship, Reflect
 ├── rules/                   # Always-on standards (Markdown)
 ├── skills/<name>/           # Workflows (SKILL.md, sometimes checklist.md)
 ├── context/                 # You refine: domain map + approved tech stack
@@ -14,6 +15,20 @@ Everything else is derived from here. Commit `.ai/` (and your chosen IDE files) 
 ```
 
 `rules/data-layer.md` is omitted when you chose **no ORM**. Skills appear only for workflows you selected.
+
+## Lifecycle
+
+Lifecycle files live under `.ai/lifecycle/`:
+
+| Stage | Purpose |
+|-------|---------|
+| `think.md` | Understand the backend goal, stack, contracts, data/auth risks, and constraints before planning |
+| `plan.md` | Name affected APIs, data models, migrations, auth boundaries, integrations, jobs, risks, and tests |
+| `build.md` | Implement only the approved backend scope |
+| `review.md` | Check correctness, API compatibility, data integrity, security, observability, and adapter output |
+| `test.md` | Run or define validation proportional to backend risk |
+| `ship.md` | Summarize changes, validation, release notes, breaking changes, and rollback notes |
+| `reflect.md` | Capture backend template gaps and follow-up tasks |
 
 ## Rules (what they steer)
 
@@ -66,17 +81,18 @@ flowchart TB
 
 ``` [Cursor]
 .cursor/rules/index.mdc      # from AGENT.md
+.cursor/rules/lifecycle.mdc  # from lifecycle/*.md
 .cursor/rules/*.mdc          # from rules/*.md (globs where relevant)
 .cursor/skills/<skill>/     # copied from .ai/skills/
 ```
 
 ``` [Claude Code]
-CLAUDE.md                    # AGENT + rules merged
+CLAUDE.md                    # AGENT + lifecycle + rules merged
 .claude/skills/<skill>/      # copied skills
 ```
 
 ``` [VS Code Copilot]
-.github/copilot-instructions.md   # single merged instruction file
+.github/copilot-instructions.md   # AGENT + lifecycle + rules merged
 ```
 
 ``` [Antigravity]
@@ -84,7 +100,7 @@ CLAUDE.md                    # AGENT + rules merged
 ```
 
 ``` [Windsurf]
-.windsurfrules               # merged AGENT + rules
+.windsurfrules               # AGENT + lifecycle + rules merged
 ```
 
 :::
@@ -97,6 +113,10 @@ A typical output includes `.ai/` plus adapter folders from the preset’s IDE li
 my-nestjs-app/
 ├── .ai/
 │   ├── AGENT.md
+│   ├── lifecycle/
+│   │   ├── think.md
+│   │   ├── plan.md
+│   │   └── …
 │   ├── rules/
 │   │   ├── architecture.md
 │   │   ├── data-layer.md

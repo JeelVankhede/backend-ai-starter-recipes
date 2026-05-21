@@ -1,0 +1,43 @@
+---
+description: Validate backend behavior with checks proportional to risk
+---
+
+# Test
+
+## Stage Goal
+
+Run or define validation for the backend change, including contracts, data, auth, integration, async, migration, smoke, and adapter checks when relevant.
+
+## Inputs Needed
+
+- Changed behavior or documentation scope.
+- Project commands.
+- Acceptance criteria.
+- Manual QA needs.
+- Adapter output paths, if generated instructions changed.
+
+## AI Behavior Expected
+
+- Run targeted tests first, then broaden when shared behavior, API contracts, migrations, auth, integrations, or generated output changed.
+- Include unit, integration, contract, e2e, migration, and smoke checks as appropriate.
+- Verify failure paths for validation, auth denial, missing data, external failures, retries, and idempotency where relevant.
+- Define manual checks when automation is missing.
+- State untested areas plainly.
+
+## AI Behavior Forbidden
+
+- Claiming tests passed without running them.
+- Hiding skipped tests or unavailable environments.
+- Treating unit tests as enough for public API, data, auth, or integration changes.
+- Marking Bare templates shipped without CLI and adapter smoke checks.
+
+## Output Expected
+
+- Commands run and results.
+- Manual QA checklist if needed.
+- Untested areas.
+- Release-blocking issues, if any.
+
+## Quality Bar
+
+Test is complete when validation is proportional to backend risk and any gaps are visible to the reviewer.

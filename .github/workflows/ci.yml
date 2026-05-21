@@ -34,3 +34,4 @@ jobs:
           npx bare --help
           npx bare --preset nestjs-prisma --output ./out
           test -f out/.ai/AGENT.md
+          test -f out/.ai/lifecycle/think.md

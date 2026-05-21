@@ -1,5 +1,9 @@
 # Architecture & Component Structure
 
+Use this rule with `.ai/lifecycle/think.md`, `.ai/lifecycle/plan.md`, `.ai/lifecycle/build.md`, and `.ai/lifecycle/review.md`.
+
+Before changing backend structure, identify affected routes/controllers, services, repositories, data models, auth boundaries, integrations, jobs, and tests. Prefer local changes over broad restructuring.
+
 {{#if isNestJS}}
 This project uses NestJS. All business logic must be encapsulated in Feature Modules.
 
@@ -48,5 +52,25 @@ This project uses Hono.
 - **Repositories:** Data access layer. Handles all direct DB/ORM calls.
 - **Global Pipes/Interceptors/Middleware:** Use for authentication, request logging, and global error catch-alls.
 
+## Decision Rules
+
+- Public route shape, status codes, and response bodies are API contracts.
+- Shared abstractions need repeated behavior or a clear ownership boundary, not a single call site.
+- Keep transport, business logic, persistence, and external integration concerns separated when the repo already separates them.
+- Name compatibility, deploy order, and rollback concerns before changing cross-module or public behavior.
+
+## Must Avoid
+
+- Creating new architecture layers for one-off work.
+- Mixing request handling, business logic, and persistence in one place when project conventions separate them.
+- Changing route/module/plugin structure without naming user-facing or operational impact.
+- Bypassing dependency injection, config, logging, or error handling conventions.
+
 ## Graceful Shutdown
 Always ensure the HTTP server and database connections close gracefully on SIGTERM and SIGINT signals to avoid dropping requests during deployments.
+
+## Acceptance Criteria
+
+- Affected routes/controllers/services/repositories are named.
+- Contract, data, auth, and operational impacts are explained.
+- Tests or manual checks cover the primary backend flow.

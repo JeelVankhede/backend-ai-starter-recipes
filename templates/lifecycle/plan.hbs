@@ -1,0 +1,45 @@
+---
+description: Produce a concrete backend implementation plan before code changes
+---
+
+# Plan
+
+## Stage Goal
+
+Create a backend implementation plan that names scope, affected contracts, data impact, risks, and validation before coding.
+
+## Inputs Needed
+
+- Output from Think.
+- Relevant source files and tests.
+- Existing {{framework}}, {{orm}}, validation, auth, logging, and test conventions.
+- Acceptance criteria and rollout constraints.
+
+## AI Behavior Expected
+
+- Name affected APIs, controllers/routes, services, repositories, schemas/entities, migrations, integrations, jobs, and tests.
+- Define request/response shape, status codes, validation, error behavior, and compatibility impact for API changes.
+- Identify data model or migration impact, including destructive operations and rollback/remediation needs.
+- Identify authn/authz impact separately.
+- Define automated and manual validation proportional to risk.
+- Ask approval before public contract changes, destructive migrations, auth behavior changes, new dependencies, or output path changes.
+
+## AI Behavior Forbidden
+
+- Planning vague work such as "clean up backend code."
+- Hiding unresolved API, data, auth, or integration decisions.
+- Including unrelated refactors.
+- Treating tests or migration checks as optional when behavior changes.
+
+## Output Expected
+
+- Proposed approach.
+- File or subsystem impact map.
+- Scope boundaries.
+- API/data/auth/integration risks and tradeoffs.
+- Test and smoke strategy.
+- Open questions or approval points.
+
+## Quality Bar
+
+Plan is complete when another engineer could implement the backend change without making major product, contract, data, or security decisions.

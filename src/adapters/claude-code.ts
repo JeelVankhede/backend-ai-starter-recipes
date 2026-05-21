@@ -6,6 +6,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import chalk from 'chalk';
 import { FileWriter } from '../writer.js';
+import { readLifecycleContent, removeFrontmatter } from './lifecycle.js';
 
 /**
  * Merges AGENT + rules into a single `CLAUDE.md` and copies skill folders.
@@ -20,6 +21,8 @@ export async function generateClaudeCode(outputDir: string, writer: FileWriter) 
 
     const agentContent = await fs.readFile(path.join(aiDir, 'AGENT.md'), 'utf-8');
     mergedContent += removeFrontmatter(agentContent) + '\n\n';
+
+    mergedContent += await readLifecycleContent(aiDir);
 
     const rulesDir = path.join(aiDir, 'rules');
     try {
@@ -57,9 +60,4 @@ export async function generateClaudeCode(outputDir: string, writer: FileWriter) 
   } catch (err) {
     console.error(chalk.red('Failed to generate Claude Code config:'), err);
   }
-}
-
-/** Strips YAML frontmatter from markdown blocks before concatenation. */
-function removeFrontmatter(content: string) {
-  return content.replace(/^---\n[\s\S]*?\n---\n+/, '');
 }
