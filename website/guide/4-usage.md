@@ -1,5 +1,29 @@
 # Usage
 
+## Try it in 2 minutes
+
+Run the NestJS/Prisma preset into a throwaway folder:
+
+```bash
+npx backend-ai-starter-recipes --preset nestjs-prisma --output ./my-backend
+```
+
+Then inspect the generated operating manual:
+
+```text
+my-backend/
+├── .ai/
+│   ├── AGENT.md
+│   ├── lifecycle/
+│   ├── rules/
+│   ├── skills/
+│   ├── context/
+│   └── tracking/
+└── .cursor/ or other IDE adapter files
+```
+
+Use `bare --preset nestjs-prisma --output ./my-backend` after a global install.
+
 ## Two modes
 
 | Mode | When to use |
@@ -52,7 +76,14 @@ flowchart TB
 
 If you omit `--output`, the CLI prompts for a directory (and warns if it is non-empty).
 
-## Presets (non-interactive)
+## Preset coverage
+
+| Preset | Stack (summary) |
+|--------|------------------|
+| `nestjs-prisma` | NestJS, TypeScript, Prisma, PostgreSQL, class-validator, Swagger/OpenAPI, JWT, Jest |
+| `nestjs-typeorm` | NestJS, TypeScript, TypeORM, PostgreSQL, class-validator, Swagger/OpenAPI, JWT, Jest |
+| `express-prisma` | Express, TypeScript, Prisma, PostgreSQL, Zod, Swagger/OpenAPI, JWT, Vitest |
+| `fastify-drizzle` | Fastify, TypeScript, Drizzle, PostgreSQL, Zod, Swagger/OpenAPI, JWT, Vitest |
 
 ::: code-group
 
@@ -102,6 +133,14 @@ api/
 ```
 
 (Preset defaults include specific IDEs; customize via interactive run or by editing a copied preset JSON for your fork.)
+
+## Known Limitations
+
+- This is an early community release intended for developer testing and feedback.
+- Presets are opinionated starting points, not proof that every team using that stack should follow the same rules.
+- Generated `.ai/` content should be reviewed and edited inside your real repo before treating it as authoritative.
+- IDE adapters depend on how each AI tool reads repository context; behavior may differ across tool versions.
+- The CLI creates AI instructions, lifecycle guidance, rules, skills, context, tracking, and adapter files. It does not scaffold a complete backend service.
 
 ---
 

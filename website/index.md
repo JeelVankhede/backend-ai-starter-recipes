@@ -7,8 +7,8 @@ hero:
   tagline: Generate opinionated rules, skills, and context so your agent already knows your stack — npm package backend-ai-starter-recipes, CLI bare.
   actions:
     - theme: brand
-      text: Start the story
-      link: /guide/1-the-problem
+      text: Try it in 2 minutes
+      link: /guide/4-usage#try-it-in-2-minutes
     - theme: alt
       text: View on GitHub
       link: https://github.com/JeelVankhede/backend-ai-starter-recipes
@@ -41,5 +41,5 @@ flowchart LR
 3. **Build** features: the agent reads those docs automatically, so you describe *what* you want, not *how* to format every PR.
 
 ::: tip Next step
-Continue with [The problem](/guide/1-the-problem) — a short story about why this exists — or jump to [Installation](/guide/3-installation) if you already sold yourself.
+Jump to [Try it in 2 minutes](/guide/4-usage#try-it-in-2-minutes), or continue with [The problem](/guide/1-the-problem).
 :::

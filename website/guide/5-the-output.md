@@ -3,6 +3,7 @@
 ## Canonical tree: `.ai/`
 
 Everything else is derived from here. Commit `.ai/` (and your chosen IDE files) like normal project config.
+The CLI creates repo instructions and adapter files, not a runnable backend service. Treat the generated `.ai/` tree as a starting operating manual for your project and edit it after reviewing the output.
 
 ```text
 .ai/
