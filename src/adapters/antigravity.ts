@@ -1,40 +1,16 @@
 /**
- * Maps .ai/skills skill folders into Antigravity .agents/workflows markdown files.
+ * Antigravity adapter — renders 7 lifecycle stage workflows `.agents/workflows/<stage>.md`
+ * from in-memory `RenderedContext`. No rules, no AGENT, no skills.
+ * Real body implemented in WP-B Phase 3 (Wave 2 subagent E).
  * @module adapters/antigravity
  */
-import fs from 'fs/promises';
-import path from 'path';
-import chalk from 'chalk';
-import { FileWriter } from '../writer.js';
+import type { FileWriter } from '../writer.js';
+import type { RenderedContext, TemplateContext, WriteResult } from '../types.js';
 
-/** Filename for skill definition; use constant so build never emits bare SKILL identifier. */
-const SKILL_FILENAME = 'SKILL.md' as const;
-
-/**
- * One workflow file per skill directory containing SKILL.md.
- * @param outputDir - Target project root
- * @param writer - Writer for the project root
- */
-export async function generateAntigravity(outputDir: string, writer: FileWriter) {
-  const aiDir = path.join(outputDir, '.ai');
-  const skillsDir = path.join(aiDir, 'skills');
-
-  try {
-    const skills = await fs.readdir(skillsDir);
-    for (const skill of skills) {
-      const skillPath = path.join(skillsDir, skill);
-      const stat = await fs.stat(skillPath);
-      if (stat.isDirectory()) {
-        try {
-          const content = await fs.readFile(path.join(skillPath, SKILL_FILENAME), 'utf-8');
-          await writer.write(`.agents/workflows/${skill}.md`, content);
-        } catch (e) {
-          /* skill without SKILL_FILENAME */
-        }
-      }
-    }
-    console.log(chalk.dim('  ↳ Generated Antigravity workflows'));
-  } catch (err) {
-    /* missing skills dir */
-  }
+export async function generateAntigravity(
+  _writer: FileWriter,
+  _rendered: RenderedContext,
+  _context: TemplateContext,
+): Promise<WriteResult[]> {
+  return [];
 }

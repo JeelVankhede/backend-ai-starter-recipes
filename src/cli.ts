@@ -24,6 +24,8 @@ import { generateClaudeCode } from './adapters/claude-code.js';
 import { generateVsCodeCopilot } from './adapters/vscode-copilot.js';
 import { generateAntigravity } from './adapters/antigravity.js';
 import { generateWindsurf } from './adapters/windsurf.js';
+import { removeFrontmatter } from './adapters/helpers.js';
+import type { RenderedContext, WriteResult } from './types.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,8 +43,8 @@ program
   .parse(process.argv);
 
 /**
- * Main generator flow: output dir → answers → `.ai/` tree → adapters.
- * @returns Promise that resolves on success; process exits on fatal error
+ * Main generator flow: output dir → answers → in-memory RenderedContext → adapters.
+ * @returns Promise that resolves on success; process exits on fatal error.
  */
 async function run() {
   const options = program.opts();
@@ -127,22 +129,34 @@ async function run() {
 
     const context = buildContext(answers);
 
-    console.log(chalk.cyan('\n⚙️  Generating Canonical .ai/ Files...'));
+    console.log(chalk.cyan('\n⚙️  Rendering templates in memory...'));
 
     const engine = new TemplateEngine(packageRootDir);
     await engine.initialize();
     const writer = new FileWriter(outputDir);
 
-    // 1. Agent
-    await writer.write('.ai/AGENT.md', await engine.render('agent.hbs', context));
+    const agentBase = await engine.render('agent.hbs', context);
+    const domainMap = await engine.render('context/domain-map.hbs', context);
+    const techStack = await engine.render('context/tech-stack.hbs', context);
 
-    // 2. Lifecycle
-    for (const stage of LIFECYCLE_FILES) {
-      await writer.write(`.ai/lifecycle/${stage}.md`, await engine.render(`lifecycle/${stage}.hbs`, context));
-    }
+    const agent = [
+      agentBase.trimEnd(),
+      '',
+      '---',
+      '',
+      '## Project Context',
+      '',
+      '### Domain Map',
+      '',
+      removeFrontmatter(domainMap).trim(),
+      '',
+      '### Tech Stack',
+      '',
+      removeFrontmatter(techStack).trim(),
+      '',
+    ].join('\n');
 
-    // 3. Rules
-    const rules = [
+    const ruleNames = [
       'architecture-api',
       'auth-security',
       'errors-logging-observability',
@@ -152,27 +166,36 @@ async function run() {
       'environment',
       'git-conventions',
     ];
-    for (const rule of rules) {
-      await writer.write(`.ai/rules/${rule}.md`, await engine.render(`rules/${rule}.hbs`, context));
+    const rules: Record<string, string> = {};
+    for (const rule of ruleNames) {
+      rules[rule] = await engine.render(`rules/${rule}.hbs`, context);
     }
     if (context.hasPrisma || context.hasTypeORM || context.hasDrizzle || context.hasMikroORM || context.hasKnex) {
-      await writer.write('.ai/rules/data-layer-migrations.md', await engine.render('rules/data-layer-migrations.hbs', context));
+      rules['data-layer-migrations'] = await engine.render('rules/data-layer-migrations.hbs', context);
     }
 
-    // 4. Context & Tracking
-    await writer.write('.ai/context/domain-map.md', await engine.render('context/domain-map.hbs', context));
-    await writer.write('.ai/context/tech-stack.md', await engine.render('context/tech-stack.hbs', context));
-    await writer.write('.ai/tracking/efficiency.md', await engine.render('tracking/efficiency.hbs', context));
+    const lifecycle: Record<string, string> = {};
+    for (const stage of LIFECYCLE_FILES) {
+      lifecycle[stage] = await engine.render(`lifecycle/${stage}.hbs`, context);
+    }
+
+    const rendered: RenderedContext = { agent, rules, lifecycle };
 
     console.log(chalk.cyan('\n⚙️  Running IDE Adapters...'));
-    if (context.ideTargets.includes('cursor')) await generateCursor(outputDir, writer);
-    if (context.ideTargets.includes('claude-code')) await generateClaudeCode(outputDir, writer);
-    if (context.ideTargets.includes('vscode-copilot')) await generateVsCodeCopilot(outputDir, writer);
-    if (context.ideTargets.includes('antigravity')) await generateAntigravity(outputDir, writer);
-    if (context.ideTargets.includes('windsurf')) await generateWindsurf(outputDir, writer);
+    const results: WriteResult[] = [];
+    if (context.ideTargets.includes('cursor')) results.push(...(await generateCursor(writer, rendered, context)));
+    if (context.ideTargets.includes('claude-code'))
+      results.push(...(await generateClaudeCode(writer, rendered, context)));
+    if (context.ideTargets.includes('vscode-copilot'))
+      results.push(...(await generateVsCodeCopilot(writer, rendered, context)));
+    if (context.ideTargets.includes('antigravity'))
+      results.push(...(await generateAntigravity(writer, rendered, context)));
+    if (context.ideTargets.includes('windsurf'))
+      results.push(...(await generateWindsurf(writer, rendered, context)));
 
     console.log(chalk.bold.green(`\n✨ Success! Output saved to: ${outputDir}`));
-    
+    console.log(chalk.dim(`   ${results.length} files written.`));
+
   } catch (err) {
     if (err instanceof Error && err.name === 'ExitPromptError') {
       console.log(chalk.yellow('\nPrompt cancelled by user.'));
