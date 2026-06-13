@@ -6,7 +6,7 @@ import { input, select, checkbox } from '@inquirer/prompts';
 import { UserAnswers } from './types.js';
 
 /**
- * Runs the full stack/IDE/skills questionnaire.
+ * Runs the full stack/IDE questionnaire.
  * @returns Structured answers for `buildContext()` in context-builder
  */
 export async function askQuestions(): Promise<UserAnswers> {
@@ -132,36 +132,6 @@ export async function askQuestions(): Promise<UserAnswers> {
     ideTargets = ['cursor', 'claude-code', 'vscode-copilot', 'antigravity', 'windsurf'];
   }
 
-  let skills = await checkbox({
-    message: 'Which AI skills/workflows to include?',
-    choices: [
-      { name: 'All Skills', value: 'all' },
-      { name: 'plan-review (Architecture review before implementation)', value: 'plan-review', checked: true },
-      { name: 'code-review (Pre-landing diff review with checklist)', value: 'code-review', checked: true },
-      { name: 'qa (Systematic API quality testing)', value: 'qa', checked: true },
-      { name: 'ship (Automated ship workflow)', value: 'ship', checked: true },
-      { name: 'document-release (Auto-update docs after shipping)', value: 'document-release' },
-      { name: 'retro (Developer productivity retrospective)', value: 'retro' },
-      { name: 'db-migration-review (Specialized migration safety review)', value: 'db-migration-review' },
-      { name: 'api-contract-check (Detects breaking changes in API contracts)', value: 'api-contract-check' },
-      { name: 'dependency-audit (Reviews dependencies for security/size)', value: 'dependency-audit' },
-    ],
-  });
-
-  if (skills.includes('all')) {
-    skills = [
-      'plan-review',
-      'code-review',
-      'qa',
-      'ship',
-      'document-release',
-      'retro',
-      'db-migration-review',
-      'api-contract-check',
-      'dependency-audit',
-    ];
-  }
-
   return {
     projectName,
     projectDescription,
@@ -176,6 +146,5 @@ export async function askQuestions(): Promise<UserAnswers> {
     monitoring,
     cicd,
     ideTargets,
-    skills,
   } as UserAnswers;
 }

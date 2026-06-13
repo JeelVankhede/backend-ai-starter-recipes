@@ -1,0 +1,65 @@
+---
+description: Guide backend error handling, logging, and operational visibility.
+---
+
+# Errors, Logging, And Observability
+
+Guide backend error handling, logging, and operational visibility.
+
+Use this rule during the Build, Review, Test, and Ship stages.
+
+Before changing error handling, logging, or observability behavior, identify public error shape, log fields, retryable vs. non-retryable failures, and failure-path tests.
+
+## AI Responsibilities
+
+- Return consistent errors to callers.
+- Log useful operational context without secrets.
+- Preserve traceability across request, integration, and job boundaries.
+- Identify retryable and non-retryable failures.
+
+## AI Must Avoid
+
+- Swallowing errors without visibility or remediation path.
+- Logging sensitive tokens or full credentials.
+- Returning internal implementation details, stack traces, SQL errors, provider internals, or config values to public clients.
+- Adding noisy logs without operational value.
+
+## Stack-Specific Guidance
+
+### Error Handling
+
+{{#if isNestJS}}
+- Never return `res.status()` manually from controllers.
+- Throw appropriate NestJS `HttpException` classes (e.g., `NotFoundException`, `BadRequestException`).
+- Use the global `ExceptionFilter` to catch unhandled errors and format them consistently.
+{{else if isExpress}}
+- Use an async wrapper to catch rejected promises and pass them to `next(err)`.
+- Use a global error-handling middleware `(err, req, res, next)` at the end of the middleware stack.
+{{else if isFastify}}
+- Define a custom `errorHandler` via `fastify.setErrorHandler()`.
+{{else if isHono}}
+- Use `app.onError((err, c) => ...)` to catch and format all unhandled exceptions.
+{{/if}}
+
+- Never leak internal server errors, database stack traces, or sensitive config values in HTTP responses.
+- Map domain errors to standard HTTP status codes (e.g., `EntityNotFound` -> `404`, `ValidationFailed` -> `400`).
+
+### Logging & Observability
+
+- Use structured JSON logging for all production logs.
+- Include a `correlation_id` (Trace ID) in all logs associated with a request lifecycle.
+- **Never** log PII (Personally Identifiable Information), passwords, tokens, or financial specifics.
+{{#if (includes monitoring "sentry")}}
+- Send unhandled exceptions and critical errors to Sentry.
+{{/if}}
+{{#if (includes monitoring "apm")}}
+- Ensure APM transaction tracing is wrapped around background jobs and HTTP requests.
+{{/if}}
+
+## Acceptance Criteria
+
+- Error shape is consistent.
+- Logs include useful context and exclude secrets.
+- Failure modes are testable or manually checkable.
+- Observability changes preserve request correlation.
+- Known limitations are documented for release.

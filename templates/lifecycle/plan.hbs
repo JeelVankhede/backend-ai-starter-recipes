@@ -6,11 +6,11 @@ description: Produce a concrete backend implementation plan before code changes
 
 ## Stage Goal
 
-Create a backend implementation plan that names scope, affected contracts, data impact, risks, and validation before coding.
+List affected API contracts, data models, migrations, auth boundaries, integrations, jobs, tests, and risks before any code changes. Do not combine Plan and Build.
 
 ## Inputs Needed
 
-- Output from Think.
+- Output from Think (restated goal, inspected areas, constraints, open questions).
 - Relevant source files and tests.
 - Existing {{framework}}, {{orm}}, validation, auth, logging, and test conventions.
 - Acceptance criteria and rollout constraints.
@@ -19,9 +19,9 @@ Create a backend implementation plan that names scope, affected contracts, data 
 
 - Name affected APIs, controllers/routes, services, repositories, schemas/entities, migrations, integrations, jobs, and tests.
 - Define request/response shape, status codes, validation, error behavior, and compatibility impact for API changes.
-- Identify data model or migration impact, including destructive operations and rollback/remediation needs.
-- Identify authn/authz impact separately.
-- Define automated and manual validation proportional to risk.
+- Identify data model or migration impact, including destructive operations and rollback or remediation needs.
+- Identify authentication (authn) and authorization (authz) impact separately.
+- Define automated and manual validation proportional to risk (unit, integration, contract, migration, smoke, manual).
 - Ask approval before public contract changes, destructive migrations, auth behavior changes, new dependencies, or output path changes.
 
 ## AI Behavior Forbidden
@@ -30,13 +30,15 @@ Create a backend implementation plan that names scope, affected contracts, data 
 - Hiding unresolved API, data, auth, or integration decisions.
 - Including unrelated refactors.
 - Treating tests or migration checks as optional when behavior changes.
+- Destructive migration changes without rollback notes.
 
 ## Output Expected
 
 - Proposed approach.
 - File or subsystem impact map.
-- Scope boundaries.
-- API/data/auth/integration risks and tradeoffs.
+- State / data model delta and migration plan.
+- Scope boundaries (in and out).
+- API / data / auth / integration risks and tradeoffs.
 - Test and smoke strategy.
 - Open questions or approval points.
 

@@ -6,24 +6,25 @@ description: Self-review backend changes for correctness, safety, and adapter ou
 
 ## Stage Goal
 
-Review changes before presenting them, with extra attention to API contracts, data integrity, auth/security, observability, integrations, async behavior, and generated output.
+Check correctness, security, data integrity, observability, integration failure modes, and adapter output before presenting backend changes. Apply extra attention to API contracts, migration safety, authn/authz, and idempotency.
 
 ## Inputs Needed
 
 - Changed files or diff.
 - Original goal and acceptance criteria.
 - Test output or validation notes.
-- Relevant `.ai/rules/` and adapter output, if generated instructions changed.
+- Your project's rule guidance for architecture, API, data, security, integrations, async, and observability.
+- Generated adapter output, if lifecycle, rule, or other instruction templates changed.
 
 ## AI Behavior Expected
 
 - Check correctness against the original backend goal.
 - Review request/response contracts, validation, status codes, and error shape.
 - Review data integrity, migration safety, rollback/remediation, and deployment compatibility.
-- Review authn/authz, sensitive-data handling, logging, and observability.
+- Review authentication and authorization, sensitive-data handling, logging, and observability.
 - Review external integration timeouts, retries, idempotency, and failure modes.
 - Identify missing tests, manual checks, and residual risk.
-- Review adapter output consistency when `.ai/` templates or generated files change.
+- Review adapter output consistency when lifecycle, rule, or other generated instruction files change.
 
 ## AI Behavior Forbidden
 
@@ -37,7 +38,7 @@ Review changes before presenting them, with extra attention to API contracts, da
 - Findings ordered by severity.
 - Missing tests or manual checks.
 - Residual risk.
-- Ready/not-ready judgment when applicable.
+- Ready / not-ready judgment when applicable.
 
 ## Quality Bar
 
