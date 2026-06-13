@@ -1,8 +1,35 @@
-# Pre-commit Quality Gates
+---
+description: Guide the setup and use of pre-commit hooks, linting, formatting, type-checking, and test gates in Bare-generated backend projects.
+---
 
-Before committing or pushing any code, ensure you have run the following local checks. Do not rely solely on CI to catch basic errors.
+# Pre-Commit Quality Gates
 
-## The Gates
+Guide the setup and use of pre-commit hooks, linting, formatting, type-checking, and test gates in Bare-generated backend projects.
+
+Use this rule during the Build, Test, and Ship stages.
+
+Before committing or pushing any code, ensure you have run the local checks. Do not rely solely on CI to catch basic errors.
+
+## AI Responsibilities
+
+- Run the project's pre-commit checks before proposing a commit.
+- Confirm that linting, formatting, and type-check pass on changed files.
+- Do not bypass hooks (`--no-verify`) unless explicitly instructed and the reason is documented.
+- When adding a new package or changing config, verify that the pre-commit suite still passes.
+- For backend projects, also confirm that affected unit tests pass before committing.
+
+## AI Must Avoid
+
+- Committing files that fail the linter or formatter.
+- Suggesting `git commit --no-verify` as a routine workaround for hook failures.
+- Introducing lint rule exceptions (`eslint-disable`, `@ts-ignore`) without a named justification.
+- Skipping type-check on files that interact with external API contracts or database schemas.
+
+## Stack-Specific Guidance
+
+For `lint-staged`, ensure the staged file glob patterns cover all changed file types including `.ts`, `.json` (for schema files), and migration files. For projects with strict type-checking on database entities or DTOs, run `tsc --noEmit` explicitly even if lint-staged does not include it by default.
+
+### The Gates
 
 1. **Lint & Formatting**
    - Run: `{{lintCommand}}`
@@ -24,9 +51,15 @@ Before committing or pushing any code, ensure you have run the following local c
    {{> testCommands }}
    - All tests must pass. If you changed a behavior, update the corresponding test.
 
-## Fix-First Heuristic
+### Fix-First Heuristic
 If you encounter errors during these gates, **fix them immediately** before adding new features. Do not stack feature code on top of failing builds or tests.
 
-## Suppressions
+### Suppressions
 - Use `@ts-expect-error` instead of `@ts-ignore` and always include a brief comment explaining why it is necessary.
 - ESLint suppressions (e.g. `// eslint-disable-next-line`) are allowed only when strictly necessary and must include a justification.
+
+## Acceptance Criteria
+
+- All changed files pass the linter and formatter before commit.
+- Type-check passes on changed modules, especially those touching API contracts or data models.
+- Pre-commit hooks are not bypassed without documented reason.

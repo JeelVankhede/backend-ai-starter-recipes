@@ -1,0 +1,138 @@
+---
+description: Guide backend architecture and API contract decisions in Bare-generated projects.
+---
+
+# Backend Architecture And API
+
+Guide backend architecture and API contract decisions in Bare-generated projects.
+
+Use this rule during the Think, Plan, Build, and Review stages.
+
+Before changing backend structure or an endpoint, identify affected routes/controllers, services, repositories, data models, auth boundaries, request/response shape, status codes, validation, error behavior, versioning impact, integrations, jobs, and tests. Prefer local changes over broad restructuring.
+
+## AI Responsibilities
+
+- Inspect current API patterns before adding endpoints.
+- Preserve public contracts unless a plan explicitly changes them.
+- Define request validation, response shape, status codes, and error cases.
+- Identify compatibility and versioning risks.
+- Keep transport, business logic, persistence, and external integration concerns separated when the repo already separates them.
+
+## AI Must Avoid
+
+- Silent response shape or status-code changes.
+- Mixing transport, business, and persistence logic when the project separates them.
+- Adding endpoints without validation and error behavior.
+- Creating new architecture layers for one-off work.
+- Bypassing dependency injection, config, logging, or error handling conventions.
+
+## Stack-Specific Guidance
+
+{{#if isNestJS}}
+This project uses NestJS. All business logic must be encapsulated in Feature Modules.
+
+### NestJS Module Structure
+- Features belong in `src/modules/<feature-name>/`
+- Register all controllers, services, and repositories in the feature module (`<feature>.module.ts`).
+- Ensure the module exports services that other modules need, rather than importing raw services across feature boundaries.
+
+### Dependency Injection (DI)
+Use constructor-based injection.
+```typescript
+constructor(
+  private readonly userService: UserService,
+  private readonly configService: ConfigService,
+) {}
+```
+{{else if isExpress}}
+This project uses Express.
+
+### Router & Middleware Structure
+- Group related routes into sub-routers in `src/routes/` or feature-based folders like `src/api/<feature>/`.
+- Mount feature routers in your main `app.ts` or `server.ts`.
+- Use Express middleware for cross-cutting concerns (auth, logging) rather than duplicating logic in handlers.
+{{else if isFastify}}
+This project uses Fastify.
+
+### Plugin Ecosystem
+- Use `fastify-plugin` (`fp`) to share decorators, hooks, and services across plugins.
+- Group related routes into feature plugins.
+- Keep the `server.js` or `app.js` entry point minimal, delegating to encapsulated plugins.
+{{else if isHono}}
+This project uses Hono.
+
+### App & Group Structure
+- Group routes using Hono's `.route()` method for modularity.
+- Place feature-specific handlers in `src/api/<feature>/`.
+- Use built-in middleware when possible or write custom middleware using `c.next()`.
+{{/if}}
+
+### Repository Pattern
+{{> repositoryPattern }}
+
+### General App Architecture
+- **Controllers/Handlers:** Parse requests, call services, format responses. No complex business logic.
+- **Services:** Pure business logic. They do not know about HTTP requests or responses.
+- **Repositories:** Data access layer. Handles all direct DB/ORM calls.
+- **Global Pipes/Interceptors/Middleware:** Use for authentication, request logging, and global error catch-alls.
+
+### Request Validation
+
+{{#if (eq validation "class-validator")}}
+- Use `class-validator` and `class-transformer` on all DTOs.
+- Enable `ValidationPipe` globally with `whitelist: true` and `transform: true`.
+- Example decorators: `@IsString()`, `@IsOptional()`, `@IsUUID()`.
+{{else if (eq validation "zod")}}
+- Define all input schemas using `zod`.
+- Use a validation middleware/pipe to intercept requests and validate `req.body` or `req.query` against the Zod schema.
+- Extract TypeScript types from schemas using `z.infer<typeof schema>`.
+{{else if (eq validation "joi")}}
+- Define all input schemas using `joi`.
+- Validate payloads using `schema.validate()` in middleware before reaching the core logic.
+{{else}}
+- Ensure all incoming payloads (body, query, params) are validated and sanitized before processing.
+{{/if}}
+
+{{#if hasSwagger}}
+### API Documentation (Swagger)
+- Every endpoint must have complete Swagger documentation.
+- Use `@ApiTags()`, `@ApiOperation()`, and `@ApiResponse()`.
+- Document all DTO properties with `@ApiProperty()` including examples and required status.
+{{/if}}
+
+### Pagination
+- Prefer cursor-based pagination for high-volume endpoints.
+- Offset pagination is permissible for low-volume administrative endpoints.
+- Always wrap paginated responses in a standard envelope:
+  ```json
+  {
+    "data": [...],
+    "meta": {
+      "nextCursor": "...",
+      "hasNextPage": true
+    }
+  }
+  ```
+
+### Rate Limiting & Throttling
+- Apply default rate limits to all public endpoints.
+- Apply strict rate limits to auth, login, and mutation endpoints to prevent brute forcing.
+
+### CORS & Security Headers
+- Ensure CORS is restricted to known origins.
+- Use Helmet or equivalent to set strict security headers.
+
+### API Versioning
+- Use URI versioning (e.g. `/v1/users`) for all endpoints.
+- When introducing breaking changes, bump the version rather than mutating existing contracts.
+
+### Graceful Shutdown
+Always ensure the HTTP server and database connections close gracefully on `SIGTERM` and `SIGINT` signals to avoid dropping requests during deployments.
+
+## Acceptance Criteria
+
+- Affected routes/controllers/services/repositories are named.
+- API change names request and response shape.
+- Error cases and status codes are defined.
+- Compatibility risk is named.
+- Tests cover success and failure paths.

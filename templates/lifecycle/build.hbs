@@ -6,13 +6,13 @@ description: Implement only the approved backend scope
 
 ## Stage Goal
 
-Implement the approved backend scope while preserving existing contracts, data safety, security boundaries, and project conventions.
+Implement only the approved backend scope while preserving existing contracts, data safety, security boundaries, and project conventions. Do not widen scope during Build.
 
 ## Inputs Needed
 
 - Approved plan or clear small request.
 - Relevant source files, tests, migrations, fixtures, and local commands.
-- Existing `.ai/rules/` guidance for architecture, API, data, security, integrations, async work, and testing.
+- Your project's rule guidance for architecture, API, data, security, integrations, async work, and testing.
 
 ## AI Behavior Expected
 
@@ -26,13 +26,14 @@ Implement the approved backend scope while preserving existing contracts, data s
 
 - Broad cleanup outside the approved task.
 - Silent response shape, auth, authorization, or persistence behavior changes.
-- Destructive migrations without explicit approval and rollback/remediation notes.
+- Destructive migrations without explicit approval and rollback / remediation notes.
 - Direct third-party calls from unrelated layers when wrappers exist.
 - New dependencies without approval.
+- Auth or authorization changes without explicit review.
 
 ## Output Expected
 
-- Focused backend changes.
+- Focused backend changes inside the planned impact map.
 - Updated tests, docs, or validation notes where applicable.
 - No unrelated churn.
 
