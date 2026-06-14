@@ -1,7 +1,7 @@
 {
   "name": "backend-ai-starter-recipes",
   "version": "1.1.0",
-  "description": "Interactive CLI for generating AI agent instructions and workflows for Node.js backend projects",
+  "description": "Bare — Backend Ai starter REcipes — interactive CLI for generating AI agent rules, lifecycle docs, and workflow starters for backend projects.",
   "type": "module",
   "main": "dist/cli.js",
   "bin": {
