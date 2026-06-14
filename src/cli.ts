@@ -10,6 +10,7 @@ import { Command, Option } from 'commander';
 import chalk from 'chalk';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import { expandPath } from './path-utils.js';
 import { askQuestions } from './prompts.js';
 import { buildContext } from './context-builder.js';
@@ -25,12 +26,26 @@ import { generateVsCodeCopilot } from './adapters/vscode-copilot.js';
 import { generateAntigravity } from './adapters/antigravity.js';
 import { generateWindsurf } from './adapters/windsurf.js';
 import { removeFrontmatter } from './adapters/helpers.js';
-import type { RenderedContext, WriteMode, WriteResult } from './types.js';
-import { BANNER_TITLE } from './banner.js';
+import type { RenderedContext, TemplateContext, WriteMode, WriteResult } from './types.js';
+import { BANNER_TITLE, renderStartupBanner, renderGenerationSummary } from './banner.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const packageRootDir = path.resolve(__dirname, '..');
+
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json') as { version: string; homepage: string };
+
+const BARE_DESCRIPTION: [string, string] = [
+  'Generate AI rules, lifecycle docs, and adapters for',
+  'your backend project.',
+];
+
+function buildStackKey(ctx: TemplateContext): string {
+  const parts: string[] = [ctx.framework];
+  if (ctx.orm !== 'none') parts.push(ctx.orm);
+  return parts.join('-');
+}
 
 const LIFECYCLE_FILES = ['think', 'plan', 'build', 'review', 'test', 'ship', 'reflect'] as const;
 
@@ -55,8 +70,18 @@ program
 async function run() {
   const options = program.opts();
 
-  console.log(chalk.bold.magenta(`\n🤖 ${BANNER_TITLE}`));
-  console.log(chalk.dim('Let\'s customize your AI agent instructions.\n'));
+  console.log();
+  console.log(
+    chalk.bold.magenta(
+      renderStartupBanner({
+        title: BANNER_TITLE,
+        version: pkg.version,
+        description: BARE_DESCRIPTION,
+        docsUrl: pkg.homepage,
+      }),
+    ),
+  );
+  console.log(chalk.dim("\nLet's customize your AI agent instructions.\n"));
 
   try {
     // 1. Resolve Output Directory
@@ -188,29 +213,38 @@ async function run() {
     const rendered: RenderedContext = { agent, rules, lifecycle };
 
     console.log(chalk.cyan('\n⚙️  Running IDE Adapters...'));
-    const results: WriteResult[] = [];
-    if (context.ideTargets.includes('cursor')) results.push(...(await generateCursor(writer, rendered, context)));
-    if (context.ideTargets.includes('claude-code'))
-      results.push(...(await generateClaudeCode(writer, rendered, context)));
-    if (context.ideTargets.includes('vscode-copilot'))
-      results.push(...(await generateVsCodeCopilot(writer, rendered, context)));
-    if (context.ideTargets.includes('antigravity'))
-      results.push(...(await generateAntigravity(writer, rendered, context)));
-    if (context.ideTargets.includes('windsurf'))
-      results.push(...(await generateWindsurf(writer, rendered, context)));
+    const byAdapter: Record<string, WriteResult[]> = {};
+    for (const adapter of context.ideTargets) {
+      if (adapter === 'cursor') byAdapter[adapter] = await generateCursor(writer, rendered, context);
+      else if (adapter === 'claude-code')
+        byAdapter[adapter] = await generateClaudeCode(writer, rendered, context);
+      else if (adapter === 'vscode-copilot')
+        byAdapter[adapter] = await generateVsCodeCopilot(writer, rendered, context);
+      else if (adapter === 'antigravity')
+        byAdapter[adapter] = await generateAntigravity(writer, rendered, context);
+      else if (adapter === 'windsurf')
+        byAdapter[adapter] = await generateWindsurf(writer, rendered, context);
+    }
 
-    const counts = results.reduce(
-      (acc, r) => {
-        acc[r.status] = (acc[r.status] ?? 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-    console.log(chalk.bold.green(`\n✨ Success! Output saved to: ${outputDir}`));
+    const totalFiles = Object.values(byAdapter).reduce((n, r) => n + r.length, 0);
+    if (totalFiles === 0) {
+      console.log(chalk.yellow('\nNo adapters selected — nothing to write.'));
+      return;
+    }
+
+    const projectLabel = `${context.projectName || path.basename(outputDir)}  (${
+      options.preset ? options.preset : buildStackKey(context)
+    })`;
+
+    console.log();
     console.log(
-      chalk.dim(
-        `   Generated ${results.length} files (${counts.created ?? 0} created, ${counts['backed-up'] ?? 0} backed up, ${counts.skipped ?? 0} skipped, ${counts.overwritten ?? 0} overwritten).`,
-      ),
+      renderGenerationSummary({
+        outputDir,
+        projectLabel,
+        byAdapter,
+        ideTargets: context.ideTargets,
+        docsUrl: pkg.homepage,
+      }),
     );
 
   } catch (err) {
