@@ -29,7 +29,7 @@ sequenceDiagram
 
 ### 1. Write requirements in plain language
 
-No ceremony — what users need, constraints, and out-of-scope. The agent already knows your framework and ORM from `.ai/`.
+No ceremony — what users need, constraints, and out-of-scope. The agent already knows your framework and ORM from the generated agent instructions.
 
 ### 2. Let the agent propose a plan
 
@@ -47,7 +47,7 @@ Outcome: scope, architecture, data layer, API, and test strategy are sanity-chec
 
 ### 4. Implement
 
-The agent should follow `.ai/rules/*` automatically — repository pattern, validation style, error handling, etc. If it drifts, point at the specific rule file.
+The agent should follow the generated rules automatically — repository pattern, validation style, error handling, etc. If it drifts, point at the specific rule file in your IDE's adapter paths.
 
 ### 5. Run **code-review** on the diff
 
@@ -71,9 +71,8 @@ Commit message conventions, push, and PR creation flow are encoded in the skill 
 
 ## After generation
 
-1. **Edit** `.ai/context/domain-map.md` with real domains and folder notes.  
-2. **Lock** `.ai/context/tech-stack.md` to libraries you actually allow.  
-3. **Use** `.ai/tracking/efficiency.md` when the same mistake keeps recurring — that is a signal to patch a rule.
+1. **Review** the generated agent instructions in your IDE (e.g. `.cursor/rules/index.mdc` for Cursor, `CLAUDE.md` for Claude Code). Edit the domain map and tech stack sections to reflect your real project.
+2. When the same mistake keeps recurring — add or tighten the relevant rule file and re-run the CLI with `--write-mode overwrite` to update.
 
 ---
 
