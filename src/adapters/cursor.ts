@@ -1,93 +1,48 @@
 /**
- * Maps canonical `.ai/` output into Cursor `.cursor/rules/*.mdc` and skills layout.
+ * Cursor adapter — renders `.cursor/rules/*.mdc` + `.cursor/rules/index.mdc` +
+ * `.cursor/skills/<stage>/SKILL.md` (lifecycle as skills) from in-memory `RenderedContext`.
  * @module adapters/cursor
  */
-import fs from 'fs/promises';
-import path from 'path';
 import chalk from 'chalk';
-import { FileWriter } from '../writer.js';
-import { readLifecycleContent } from './lifecycle.js';
+import type { FileWriter } from '../writer.js';
+import type { RenderedContext, TemplateContext, WriteResult } from '../types.js';
+import { removeFrontmatter, extractDescription, formatGlobs } from './helpers.js';
+import { RULE_CURSOR_METADATA, type CursorRuleMeta } from '../rule-cursor-metadata.js';
 
-/**
- * Reads generated `.ai` files and writes Cursor-specific rule files with frontmatter.
- * @param outputDir - Target project root
- * @param writer - Writer scoped to the same project root
- */
-export async function generateCursor(outputDir: string, writer: FileWriter) {
-  const aiDir = path.join(outputDir, '.ai');
-
-  try {
-    const agentContent = await fs.readFile(path.join(aiDir, 'AGENT.md'), 'utf-8');
-    await writer.write('.cursor/rules/index.mdc', addFrontmatter(agentContent, 'alwaysApply: true', 'Master Instructions'));
-
-    const rulesDir = path.join(aiDir, 'rules');
-    const ruleFiles = await fs.readdir(rulesDir);
-
-    for (const file of ruleFiles) {
-      if (!file.endsWith('.md')) continue;
-      const content = await fs.readFile(path.join(rulesDir, file), 'utf-8');
-      const basename = path.basename(file, '.md');
-
-      let globs = '';
-      if (basename === 'data-layer') {
-        globs = formatGlobs(['prisma/**/*', '**/*.repository.ts', '**/*.entity.ts', 'src/db/**/*']);
-      } else if (basename === 'api-patterns') {
-        globs = formatGlobs(['**/*.dto.ts', '**/*.controller.ts', '**/*.route.ts']);
-      } else if (basename === 'testing') {
-        globs = formatGlobs(['**/*.spec.ts', '**/*.e2e-spec.ts', '**/*.test.ts']);
-      } else if (basename === 'external-integrations') {
-        globs = formatGlobs(['src/external/**/*.ts']);
-      } else {
-        globs = 'alwaysApply: true';
-      }
-
-      await writer.write(`.cursor/rules/${basename}.mdc`, addFrontmatter(content, globs, basename));
-    }
-
-    const lifecycleContent = await readLifecycleContent(aiDir);
-    if (lifecycleContent.trim()) {
-      await writer.write(
-        '.cursor/rules/lifecycle.mdc',
-        addFrontmatter(lifecycleContent, 'alwaysApply: true', 'Lifecycle workflow'),
-      );
-    }
-
-    const skillsDir = path.join(aiDir, 'skills');
-    try {
-      const skills = await fs.readdir(skillsDir);
-      for (const skill of skills) {
-        const skillPath = path.join(skillsDir, skill);
-        const stat = await fs.stat(skillPath);
-        if (stat.isDirectory()) {
-          const files = await fs.readdir(skillPath);
-          for (const file of files) {
-            const content = await fs.readFile(path.join(skillPath, file), 'utf-8');
-            await writer.write(`.cursor/skills/${skill}/${file}`, content);
-          }
-        }
-      }
-    } catch (e) {
-      /* no skills */
-    }
-
-    console.log(chalk.dim('  ↳ Generated Cursor configuration'));
-  } catch (err) {
-    console.error(chalk.red('Failed to generate Cursor config:'), err);
+function formatDirective(directive: CursorRuleMeta): string {
+  if ('globs' in directive) {
+    return formatGlobs(directive.globs);
   }
+  return `alwaysApply: ${directive.alwaysApply}`;
 }
 
-/**
- * Wraps markdown in Cursor rule frontmatter (`description`, globs or alwaysApply).
- */
-function addFrontmatter(content: string, rule: string, description: string) {
-  return `---
-description: ${description}
-${rule}
----
+export async function generateCursor(
+  writer: FileWriter,
+  rendered: RenderedContext,
+  _context: TemplateContext,
+): Promise<WriteResult[]> {
+  const results: WriteResult[] = [];
 
-${content.replace(/^---\n[\s\S]*?\n---\n+/, '')}`;
-}
+  // 1. Master index
+  const indexBody = removeFrontmatter(rendered.agent);
+  const indexContent = `---\ndescription: Master Instructions\nalwaysApply: true\n---\n\n${indexBody}`;
+  results.push(await writer.write('.cursor/rules/index.mdc', indexContent));
 
-function formatGlobs(patterns: string[]) {
-  return ['globs:', ...patterns.map((pattern) => `  - ${JSON.stringify(pattern)}`)].join('\n');
+  // 2. Per-rule .mdc files
+  for (const [ruleName, content] of Object.entries(rendered.rules)) {
+    const directive: CursorRuleMeta = RULE_CURSOR_METADATA[ruleName] ?? { alwaysApply: true };
+    const description = extractDescription(content) || ruleName;
+    const body = removeFrontmatter(content);
+    const frontmatter = `---\ndescription: ${description}\n${formatDirective(directive)}\n---`;
+    const fileContent = `${frontmatter}\n\n${body}`;
+    results.push(await writer.write(`.cursor/rules/${ruleName}.mdc`, fileContent));
+  }
+
+  // 3. Lifecycle stages as skills
+  for (const [stageName, content] of Object.entries(rendered.lifecycle)) {
+    results.push(await writer.write(`.cursor/skills/${stageName}/SKILL.md`, content));
+  }
+
+  console.log(chalk.dim('  ↳ Generated Cursor configuration'));
+  return results;
 }

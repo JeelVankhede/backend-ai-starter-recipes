@@ -5,22 +5,25 @@
 import fs from 'fs/promises';
 import path from 'path';
 import chalk from 'chalk';
+import type { WriteResult } from './types.js';
 
 /**
  * Writes paths relative to a single output directory (the user's project folder).
+ * In WP-B every write returns `{ status: 'created' }`; WP-C extends this with backup/skip/overwrite.
  */
 export class FileWriter {
   /**
-   * @param outputDir - Absolute path to the project directory receiving `.ai/`, etc.
+   * @param outputDir - Absolute path to the consumer's project directory.
    */
   constructor(private outputDir: string) {}
 
   /**
    * Ensures parent dirs exist, then writes UTF-8 text (trimmed + trailing newline).
-   * @param relativePath - Path relative to output (e.g. `.ai/AGENT.md`)
-   * @param content - File body
+   * @param relativePath - Path relative to output (e.g. `.cursor/rules/index.mdc`).
+   * @param content - File body.
+   * @returns The write result with relative path and status.
    */
-  async write(relativePath: string, content: string): Promise<void> {
+  async write(relativePath: string, content: string): Promise<WriteResult> {
     const fullPath = path.join(this.outputDir, relativePath);
     const dir = path.dirname(fullPath);
 
@@ -28,11 +31,12 @@ export class FileWriter {
     await fs.writeFile(fullPath, content.trim() + '\n', 'utf-8');
 
     console.log(chalk.green('✓ Created:'), chalk.dim(relativePath));
+    return { path: relativePath, status: 'created' };
   }
 
   /**
    * Removes a subdirectory under output (e.g. before a clean regen). Errors are ignored.
-   * @param relativeDir - Directory relative to output root
+   * @param relativeDir - Directory relative to output root.
    */
   async ensureCleanOutputDir(relativeDir: string) {
     const fullPath = path.join(this.outputDir, relativeDir);

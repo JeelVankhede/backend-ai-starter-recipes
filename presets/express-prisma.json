@@ -11,6 +11,7 @@
   "testFramework": "vitest",
   "monitoring": [],
   "cicd": "github-actions",
-  "ideTargets": ["cursor"],
-  "skills": ["plan-review", "code-review", "qa"]
+  "ideTargets": [
+    "cursor"
+  ]
 }

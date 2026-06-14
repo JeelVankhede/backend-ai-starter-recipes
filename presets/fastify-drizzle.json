@@ -9,8 +9,12 @@
   "apiDocs": "none",
   "auth": "jwt-passport",
   "testFramework": "vitest",
-  "monitoring": ["sentry", "apm"],
+  "monitoring": [
+    "sentry",
+    "apm"
+  ],
   "cicd": "github-actions",
-  "ideTargets": ["windsurf"],
-  "skills": ["plan-review", "code-review", "qa", "ship"]
+  "ideTargets": [
+    "windsurf"
+  ]
 }
