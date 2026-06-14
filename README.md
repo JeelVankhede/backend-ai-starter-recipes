@@ -1,4 +1,4 @@
-# Backend AI Starter Recipes
+# Bare — **B**ackend **A**i starter **RE**cipes
 
 [![CI](https://github.com/JeelVankhede/backend-ai-starter-recipes/actions/workflows/ci.yml/badge.svg)](https://github.com/JeelVankhede/backend-ai-starter-recipes/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/backend-ai-starter-recipes.svg)](https://www.npmjs.com/package/backend-ai-starter-recipes)
