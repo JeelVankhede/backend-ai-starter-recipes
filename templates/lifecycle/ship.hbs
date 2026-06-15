@@ -13,7 +13,6 @@ Summarize changes, validation, release notes, breaking changes, and rollback con
 - Final diff or artifact list.
 - Test output.
 - Known limitations.
-- Migration plan if templates move into Bare.
 - Adapter output review when generated files changed.
 
 ## AI Behavior Expected
@@ -23,13 +22,10 @@ Summarize changes, validation, release notes, breaking changes, and rollback con
 - Call out public API changes, data/migration changes, auth/security changes, output path changes, and breaking changes.
 - Draft release notes when relevant.
 - Identify rollback or remediation steps (for example, `db migrate:down` plus reverting route registration for an endpoint change).
-- Record source mapping only after actual Bare release.
-
 ## AI Behavior Forbidden
 
 - Claiming release readiness while blockers remain.
 - Omitting known limitations.
-- Marking engineering repo templates as shipped before Bare release.
 - Skipping adapter review for generated-output changes.
 
 ## Output Expected

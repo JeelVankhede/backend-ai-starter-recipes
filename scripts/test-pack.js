@@ -13,6 +13,7 @@ import { execSync } from 'child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 
+import { statSync } from 'fs';
 const tgzFiles = readdirSync(repoRoot).filter(
   (f) => f.startsWith('backend-ai-starter-recipes-') && f.endsWith('.tgz')
 );
@@ -20,6 +21,8 @@ if (tgzFiles.length === 0) {
   console.error('No backend-ai-starter-recipes-*.tgz found. Run: npm run build && npm pack');
   process.exit(1);
 }
+// Use the most recently created tarball (in case stale older versions exist).
+tgzFiles.sort((a, b) => statSync(path.join(repoRoot, b)).mtimeMs - statSync(path.join(repoRoot, a)).mtimeMs);
 const tarballPath = path.join(repoRoot, tgzFiles[0]);
 
 const tmpDir = mkdtempSync(path.join(os.tmpdir(), 'bare-pack-'));
@@ -31,6 +34,7 @@ try {
     cwd: tmpDir,
     stdio: 'inherit',
     env: { ...process.env, CI: '1' },
+    timeout: 120000,
   });
   // v1.2: no .ai/ intermediate tree. The nestjs-prisma preset selects cursor
   // and claude-code adapters; we sanity-check one file per selected adapter

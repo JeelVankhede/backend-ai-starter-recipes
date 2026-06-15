@@ -12,6 +12,10 @@
   "monitoring": [],
   "cicd": "github-actions",
   "ideTargets": [
-    "cursor"
+    "cursor",
+    "claude-code",
+    "vscode-copilot",
+    "antigravity",
+    "windsurf"
   ]
 }

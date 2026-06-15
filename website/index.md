@@ -22,7 +22,7 @@ features:
     details: Reusable workflows like plan-review, code-review, QA, and ship so every feature follows the same quality path without re-prompting.
   - title: Multi-IDE adapters
     icon: 🖥️
-    details: One canonical .ai/ tree becomes Cursor rules, Claude Code, Copilot instructions, Antigravity workflows, or Windsurf rules — pick what you use.
+    details: Your stack choices render directly into Cursor rules, Claude Code instructions, Copilot config, Antigravity workflows, or Windsurf rules — pick what you use.
 
 ---
 
@@ -31,13 +31,12 @@ features:
 ```mermaid
 flowchart LR
   A[You answer prompts] --> B[CLI renders templates]
-  B --> C[".ai/ rules + skills"]
-  C --> D[IDE-specific files]
-  D --> E[Agent follows your standards]
+  B --> C[IDE-native files]
+  C --> D[Agent follows your standards]
 ```
 
 1. **Run** `npx backend-ai-starter-recipes` (or `bare` if installed globally) and point at your project folder.  
-2. **Get** a `.ai/` directory — your single source of truth — plus files your IDE understands.  
+2. **Get** adapter-native files for every IDE you selected — Cursor rules, a `CLAUDE.md`, Copilot instructions, Windsurf rules, or Antigravity workflows. Nothing else lands in your project.  
 3. **Build** features: the agent reads those docs automatically, so you describe *what* you want, not *how* to format every PR.
 
 ::: tip Next step
