@@ -9,6 +9,8 @@ Generate opinionated, customized AI agent instructions and workflows for your No
 
 **Package:** [`backend-ai-starter-recipes`](https://www.npmjs.com/package/backend-ai-starter-recipes) on npm. **Short CLI:** `bare` (after global install).
 
+For frontend projects, the companion CLI is [frontend-ai-starter-recipes](https://www.npmjs.com/package/frontend-ai-starter-recipes) (fare) — see [frontend-ai-starter-recipes](https://github.com/JeelVankhede/frontend-ai-starter-recipes).
+
 Requires **Node.js 20+**.
 
 ## Try it in 2 minutes

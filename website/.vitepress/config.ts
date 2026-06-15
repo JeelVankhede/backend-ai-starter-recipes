@@ -4,7 +4,7 @@ import { withMermaid } from 'vitepress-plugin-mermaid';
 // https://vitepress.dev/reference/site-config
 export default withMermaid(
   defineConfig({
-    title: 'Bare — Backend Ai starter REcipes',
+    title: 'Bare',
     description:
       'Documentation for backend-ai-starter-recipes — AI agent rules, skills, and workflows for Node.js backends.',
     base: '/backend-ai-starter-recipes/',
@@ -22,8 +22,15 @@ export default withMermaid(
           link: 'https://github.com/JeelVankhede/backend-ai-starter-recipes/wiki',
         },
         {
-          text: 'GitHub',
-          link: 'https://github.com/JeelVankhede/backend-ai-starter-recipes',
+          text: 'v1.2',
+          items: [
+            { text: 'v1.2 (current)', link: '/', target: '_self' },
+            {
+              text: 'v1.1',
+              link: 'https://jeelvankhede.github.io/backend-ai-starter-recipes/v1.1/',
+              target: '_self',
+            },
+          ],
         },
       ],
 

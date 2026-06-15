@@ -26,11 +26,11 @@ That friction is not laziness — it is **missing shared context**. General-purp
 
 | Piece | Role |
 |-------|------|
-| `.ai/AGENT.md` | Core behavior: who the agent is for this project |
-| `.ai/rules/*.md` | Always-on standards (architecture, API, errors, Git, …) |
-| `.ai/skills/*/` | Named workflows with clear entry points |
-| `.ai/context/` | Human-maintained map of domains and approved stack |
-| IDE adapters | Same content in Cursor / Claude / Copilot / Antigravity / Windsurf |
+| **Agent file** | Core identity, quality gates, and principles for your repo |
+| **Rules** (9 files) | Always-on standards — architecture, API, data layer, errors, testing, Git, and more |
+| **Lifecycle stages** | Seven named workflows — Think, Plan, Build, Review, Test, Ship, Reflect |
+| **Context** | Domain map and approved tech stack you fill in once |
+| **IDE format** | Delivered as Cursor `.mdc` rules, `CLAUDE.md`, Copilot instructions, Windsurf rules, or Antigravity workflows |
 
 ---
 
