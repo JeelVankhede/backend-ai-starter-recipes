@@ -51,6 +51,8 @@ jobs:
           npm run build
           npm run check:dist
           npm test
+        env:
+          MIXPANEL_TOKEN: ${{ secrets.MIXPANEL_TOKEN }}
 
       - name: Bump version
         id: version
