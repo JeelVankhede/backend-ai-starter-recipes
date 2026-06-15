@@ -72,7 +72,7 @@ async function run() {
 
   console.log();
   console.log(
-    chalk.bold.cyan(
+    chalk.bold.magenta(
       renderStartupBanner({
         title: BANNER_TITLE,
         version: pkg.version,
@@ -145,7 +145,7 @@ async function run() {
     let answers;
     
     if (options.preset) {
-      console.log(chalk.bold.cyan(`\n🧩  Loading preset: ${options.preset}`));
+      console.log(chalk.bold.magenta(`\n🧩  Loading preset: ${options.preset}`));
       const presetPath = path.join(packageRootDir, 'presets', `${options.preset}.json`);
       try {
         const presetData = await fs.readFile(presetPath, 'utf-8');
@@ -158,7 +158,7 @@ async function run() {
       answers = await askQuestions();
     }
 
-    console.log(chalk.bold.cyan('\n📋  Building template context…'));
+    console.log(chalk.bold.magenta('\n📋  Building template context…'));
     const context = buildContext(answers);
 
     let writeMode = options.writeMode as WriteMode;
@@ -209,7 +209,7 @@ async function run() {
       'environment',
       'git-conventions',
     ];
-    console.log(chalk.bold.cyan(`\n🔨  Rendering rules (${ruleNames.length + (context.hasPrisma || context.hasTypeORM || context.hasDrizzle || context.hasMikroORM || context.hasKnex ? 1 : 0)})…`));
+    console.log(chalk.bold.magenta(`\n🔨  Rendering rules (${ruleNames.length + (context.hasPrisma || context.hasTypeORM || context.hasDrizzle || context.hasMikroORM || context.hasKnex ? 1 : 0)})…`));
     const rules: Record<string, string> = {};
     for (const rule of ruleNames) {
       rules[rule] = await engine.render(`rules/${rule}.hbs`, context);
@@ -218,7 +218,7 @@ async function run() {
       rules['data-layer-migrations'] = await engine.render('rules/data-layer-migrations.hbs', context);
     }
 
-    console.log(chalk.bold.cyan(`\n🔄  Rendering lifecycle stages (${LIFECYCLE_FILES.length})…`));
+    console.log(chalk.bold.magenta(`\n🔄  Rendering lifecycle stages (${LIFECYCLE_FILES.length})…`));
     const lifecycle: Record<string, string> = {};
     for (const stage of LIFECYCLE_FILES) {
       lifecycle[stage] = await engine.render(`lifecycle/${stage}.hbs`, context);
@@ -228,7 +228,7 @@ async function run() {
 
     const byAdapter: Record<string, WriteResult[]> = {};
     for (const adapter of context.ideTargets) {
-      console.log(chalk.bold.cyan(`\n🖥️   Writing ${ADAPTER_NAMES[adapter] ?? adapter} adapter…`));
+      console.log(chalk.bold.magenta(`\n🖥️   Writing ${ADAPTER_NAMES[adapter] ?? adapter} adapter…`));
       if (adapter === 'cursor') byAdapter[adapter] = await generateCursor(writer, rendered, context);
       else if (adapter === 'claude-code')
         byAdapter[adapter] = await generateClaudeCode(writer, rendered, context);
@@ -252,7 +252,7 @@ async function run() {
 
     console.log();
     console.log(
-      chalk.bold.cyan(
+      chalk.bold.magenta(
         renderGenerationSummary({
           outputDir,
           projectLabel,
