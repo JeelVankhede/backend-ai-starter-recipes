@@ -24,7 +24,6 @@ function minimalContext(): TemplateContext {
     monitoring: [],
     cicd: 'github-actions',
     ideTargets: [],
-    skills: [],
     ormServiceName: 'PrismaService',
     ormSchemaPath: 'prisma/schema.prisma',
     testCommand: 'npm test',
@@ -61,12 +60,12 @@ describe('TemplateEngine', () => {
     expect(out).toMatch(/AI|agent|NestJS|project/i);
   });
 
-  it('renders data-layer.hbs when hasPrisma true vs false', async () => {
-    const withPrisma = await engine.render('rules/data-layer.hbs', {
+  it('renders data-layer-migrations.hbs when hasPrisma true vs false', async () => {
+    const withPrisma = await engine.render('rules/data-layer-migrations.hbs', {
       ...minimalContext(),
       hasPrisma: true,
     });
-    const without = await engine.render('rules/data-layer.hbs', {
+    const without = await engine.render('rules/data-layer-migrations.hbs', {
       ...minimalContext(),
       hasPrisma: false,
       orm: 'none',

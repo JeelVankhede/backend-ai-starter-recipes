@@ -1,234 +1,169 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+/**
+ * Edge-case tests for the five IDE adapters: empty inputs, fallbacks, and
+ * per-adapter quirks. All inputs are in-memory `RenderedContext` values.
+ */
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+vi.mock('../src/sleep.js', () => ({ sleep: vi.fn().mockResolvedValue(undefined) }));
 import fs from 'fs/promises';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import os from 'os';
 import { FileWriter } from '../src/writer.js';
 import { generateCursor } from '../src/adapters/cursor.js';
 import { generateClaudeCode } from '../src/adapters/claude-code.js';
 import { generateVsCodeCopilot } from '../src/adapters/vscode-copilot.js';
-import { generateWindsurf } from '../src/adapters/windsurf.js';
 import { generateAntigravity } from '../src/adapters/antigravity.js';
+import { generateWindsurf } from '../src/adapters/windsurf.js';
+import type { RenderedContext, TemplateContext } from '../src/types.js';
+import { EMPTY_RENDERED } from './fixtures/rendered-context.js';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const FAKE_CONTEXT = {} as TemplateContext;
 
-function expectCursorGlobs(content: string, patterns: string[]) {
-  expect(content).toContain(
-    ['globs:', ...patterns.map((pattern) => `  - ${JSON.stringify(pattern)}`)].join('\n'),
-  );
-  expect(content).not.toContain('globs: "');
+async function exists(p: string): Promise<boolean> {
+  try {
+    await fs.access(p);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-describe('adapter error and branch paths', () => {
-  beforeEach(() => {
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.spyOn(console, 'log').mockImplementation(() => {});
+describe('IDE adapters — edge cases', () => {
+  let tmp: string;
+
+  beforeEach(async () => {
+    tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-adapters-edge-'));
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('generateCursor logs error when .ai is missing', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-cur-err-'));
+  it('Cursor: empty rules + empty lifecycle still writes index.mdc', async () => {
     const writer = new FileWriter(tmp);
-    await generateCursor(tmp, writer);
-    expect(vi.mocked(console.error)).toHaveBeenCalled();
+    const results = await generateCursor(writer, EMPTY_RENDERED, FAKE_CONTEXT);
+
+    expect(results).toHaveLength(1);
+    const index = await fs.readFile(path.join(tmp, '.cursor/rules/index.mdc'), 'utf-8');
+    expect(index).toMatch(/description:\s*Master Instructions/);
+    expect(index).toMatch(/alwaysApply:\s*true/);
+    expect(index).toMatch(/# Empty Agent/);
+    expect(await exists(path.join(tmp, '.cursor/skills'))).toBe(false);
   });
 
-  it('generateClaudeCode logs error when AGENT.md missing', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-claude-err-'));
+  it('Cursor: unknown rule name (not in RULE_CURSOR_METADATA) falls back to alwaysApply: true', async () => {
     const writer = new FileWriter(tmp);
-    await generateClaudeCode(tmp, writer);
-    expect(vi.mocked(console.error)).toHaveBeenCalled();
-  });
+    const ctx: RenderedContext = {
+      agent: '# Agent\n',
+      rules: {
+        'totally-unknown-rule':
+          '---\ndescription: Unknown rule desc\n---\n\n# Unknown\n\nUnknown body.\n',
+      },
+      lifecycle: {},
+    };
+    await generateCursor(writer, ctx, FAKE_CONTEXT);
 
-  it('generateVsCodeCopilot logs error when .ai missing', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-copilot-err-'));
-    const writer = new FileWriter(tmp);
-    await generateVsCodeCopilot(tmp, writer);
-    expect(vi.mocked(console.error)).toHaveBeenCalled();
-  });
-
-  it('generateWindsurf logs error when .ai missing', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-wind-err-'));
-    const writer = new FileWriter(tmp);
-    await generateWindsurf(tmp, writer);
-    expect(vi.mocked(console.error)).toHaveBeenCalled();
-  });
-
-  it('generateVsCodeCopilot succeeds with AGENT only (no rules dir)', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-copilot-agent-'));
-    await fs.mkdir(path.join(tmp, '.ai'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# Agent only');
-    const writer = new FileWriter(tmp);
-    await generateVsCodeCopilot(tmp, writer);
-    const md = await fs.readFile(path.join(tmp, '.github', 'copilot-instructions.md'), 'utf-8');
-    expect(md).toMatch(/Agent only/);
-  });
-
-  it('generateVsCodeCopilot includes lifecycle content when present', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-copilot-life-'));
-    await fs.mkdir(path.join(tmp, '.ai', 'lifecycle'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# Agent');
-    await fs.writeFile(path.join(tmp, '.ai', 'lifecycle', 'think.md'), '# Think life');
-    const writer = new FileWriter(tmp);
-    await generateVsCodeCopilot(tmp, writer);
-    const md = await fs.readFile(path.join(tmp, '.github', 'copilot-instructions.md'), 'utf-8');
-    expect(md).toMatch(/Think life/);
-  });
-
-  it('generateWindsurf succeeds with AGENT only', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-wind-agent-'));
-    await fs.mkdir(path.join(tmp, '.ai'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# W');
-    const writer = new FileWriter(tmp);
-    await generateWindsurf(tmp, writer);
-    expect(await fs.readFile(path.join(tmp, '.windsurfrules'), 'utf-8')).toMatch(/W/);
-  });
-
-  it('generateClaudeCode with agent only + skills as file (inner catch)', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-claude-sk-'));
-    await fs.mkdir(path.join(tmp, '.ai'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# A');
-    await fs.writeFile(path.join(tmp, '.ai', 'skills'), 'not-a-dir');
-    const writer = new FileWriter(tmp);
-    await generateClaudeCode(tmp, writer);
-    const claude = await fs.readFile(path.join(tmp, 'CLAUDE.md'), 'utf-8');
-    expect(claude).toMatch(/A/);
-  });
-
-  it('generateCursor skips non-directory entries in skills', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-cur-skip-'));
-    await fs.mkdir(path.join(tmp, '.ai', 'rules'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# A');
-    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'x.md'), '# R');
-    await fs.mkdir(path.join(tmp, '.ai', 'skills'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'skills', 'not-folder'), 'x');
-    await fs.mkdir(path.join(tmp, '.ai', 'skills', 'plan-review'), { recursive: true });
-    await fs.writeFile(
-      path.join(tmp, '.ai', 'skills', 'plan-review', 'SKILL.md'),
-      '# S',
-    );
-    const writer = new FileWriter(tmp);
-    await generateCursor(tmp, writer);
-    expect(await fs.readFile(path.join(tmp, '.cursor/skills/plan-review/SKILL.md'), 'utf-8')).toMatch(
-      /S/,
-    );
-  });
-
-  it('generateCursor writes lifecycle rule when lifecycle content exists', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-cur-life-'));
-    await fs.mkdir(path.join(tmp, '.ai', 'rules'), { recursive: true });
-    await fs.mkdir(path.join(tmp, '.ai', 'lifecycle'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# A');
-    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'x.md'), '# R');
-    await fs.writeFile(path.join(tmp, '.ai', 'lifecycle', 'plan.md'), '# Plan life');
-    const writer = new FileWriter(tmp);
-    await generateCursor(tmp, writer);
-    const lifecycle = await fs.readFile(path.join(tmp, '.cursor/rules/lifecycle.mdc'), 'utf-8');
-    expect(lifecycle).toMatch(/Plan life/);
-  });
-
-  it('generateCursor api-patterns and external-integrations globs', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-cur-glob-'));
-    await fs.mkdir(path.join(tmp, '.ai', 'rules'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# A');
-    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'api-patterns.md'), '# API');
-    await fs.writeFile(
-      path.join(tmp, '.ai', 'rules', 'external-integrations.md'),
-      '# Ext',
-    );
-    const writer = new FileWriter(tmp);
-    await generateCursor(tmp, writer);
-    const api = await fs.readFile(path.join(tmp, '.cursor/rules/api-patterns.mdc'), 'utf-8');
-    expectCursorGlobs(api, ['**/*.dto.ts', '**/*.controller.ts', '**/*.route.ts']);
-    expect(api).toMatch(/\.controller\.ts/);
-    const ext = await fs.readFile(
-      path.join(tmp, '.cursor/rules/external-integrations.mdc'),
+    const file = await fs.readFile(
+      path.join(tmp, '.cursor/rules/totally-unknown-rule.mdc'),
       'utf-8',
     );
-    expectCursorGlobs(ext, ['src/external/**/*.ts']);
-    expect(ext).toMatch(/src\/external/);
+    expect(file).toMatch(/description:\s*Unknown rule desc/);
+    expect(file).toMatch(/alwaysApply:\s*true/);
+    expect(file).not.toMatch(/globs:/);
   });
 
-  it('generateAntigravity skips non-directories and dirs without SKILL.md', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-anti-'));
-    await fs.mkdir(path.join(tmp, '.ai', 'skills'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'skills', 'readme.txt'), 'x');
-    await fs.mkdir(path.join(tmp, '.ai', 'skills', 'empty-skill'), { recursive: true });
-    await fs.mkdir(path.join(tmp, '.ai', 'skills', 'ok-skill'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'skills', 'ok-skill', 'SKILL.md'), '# OK');
+  it('Cursor: rule body without description frontmatter falls back to rule basename', async () => {
     const writer = new FileWriter(tmp);
-    await generateAntigravity(tmp, writer);
-    expect(await fs.readFile(path.join(tmp, '.agents/workflows/ok-skill.md'), 'utf-8')).toMatch(
-      /OK/,
+    const ctx: RenderedContext = {
+      agent: '# Agent\n',
+      rules: {
+        'architecture-api': '# Architecture\n\nNo frontmatter here.\n',
+      },
+      lifecycle: {},
+    };
+    await generateCursor(writer, ctx, FAKE_CONTEXT);
+
+    const file = await fs.readFile(
+      path.join(tmp, '.cursor/rules/architecture-api.mdc'),
+      'utf-8',
     );
-    const names = await fs.readdir(path.join(tmp, '.agents/workflows'));
-    expect(names).toEqual(['ok-skill.md']);
+    expect(file).toMatch(/^description:\s*architecture-api$/m);
+    expect(file).toMatch(/alwaysApply:\s*true/);
   });
 
-  it('generateAntigravity no-op when skills dir missing', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-anti-miss-'));
-    await fs.mkdir(path.join(tmp, '.ai'), { recursive: true });
+  it('Claude Code: rule without description frontmatter falls back to rule name in CLAUDE.md pointer', async () => {
     const writer = new FileWriter(tmp);
-    await generateAntigravity(tmp, writer);
-    await expect(fs.access(path.join(tmp, '.agents'))).rejects.toThrow();
-  });
+    const ctx: RenderedContext = {
+      agent: '# Agent\n',
+      rules: { architecture: '# Architecture\n\nNo frontmatter here.\n' },
+      lifecycle: {},
+    };
+    await generateClaudeCode(writer, ctx, FAKE_CONTEXT);
 
-  it('generateCursor skips non-.md files in rules', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-cur-md-'));
-    await fs.mkdir(path.join(tmp, '.ai', 'rules'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# A');
-    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'only.txt'), 'x');
-    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'keep.md'), '# K');
-    const writer = new FileWriter(tmp);
-    await generateCursor(tmp, writer);
-    const keep = await fs.readFile(path.join(tmp, '.cursor/rules/keep.mdc'), 'utf-8');
-    expect(keep).toMatch(/K/);
-  });
-
-  it('generateClaudeCode merges rules and copies skill files', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-claude-full-'));
-    await fs.mkdir(path.join(tmp, '.ai', 'rules'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# Agent');
-    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'skip.bin'), '');
-    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'rule.md'), '# Rule body');
-    await fs.mkdir(path.join(tmp, '.ai', 'skills'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'skills', 'not-a-folder'), 'skip');
-    await fs.mkdir(path.join(tmp, '.ai', 'skills', 's1'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'skills', 's1', 'SKILL.md'), '# S');
-    await fs.writeFile(path.join(tmp, '.ai', 'skills', 's1', 'extra.md'), '# E');
-    const writer = new FileWriter(tmp);
-    await generateClaudeCode(tmp, writer);
-    const claude = await fs.readFile(path.join(tmp, 'CLAUDE.md'), 'utf-8');
-    expect(claude).toMatch(/Agent/);
-    expect(claude).toMatch(/Rule body/);
-    expect(await fs.readFile(path.join(tmp, '.claude/skills/s1/SKILL.md'), 'utf-8')).toMatch(/S/);
-    expect(await fs.readFile(path.join(tmp, '.claude/skills/s1/extra.md'), 'utf-8')).toMatch(/E/);
-  });
-
-  it('generateVsCodeCopilot skips non-.md in rules', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-vsc-skip-'));
-    await fs.mkdir(path.join(tmp, '.ai', 'rules'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# A');
-    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'x.txt'), 'nope');
-    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'r.md'), '# R');
-    const writer = new FileWriter(tmp);
-    await generateVsCodeCopilot(tmp, writer);
-    expect(await fs.readFile(path.join(tmp, '.github/copilot-instructions.md'), 'utf-8')).toMatch(
-      /R/,
+    const claudeMd = await fs.readFile(path.join(tmp, 'CLAUDE.md'), 'utf-8');
+    expect(claudeMd).toMatch(
+      /- \[architecture\]\(\.claude\/rules\/architecture\.md\) — load when architecture\./,
     );
   });
 
-  it('generateWindsurf skips non-.md in rules', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'bare-ws-skip-'));
-    await fs.mkdir(path.join(tmp, '.ai', 'rules'), { recursive: true });
-    await fs.writeFile(path.join(tmp, '.ai', 'AGENT.md'), '# A');
-    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'bad.exe'), '');
-    await fs.writeFile(path.join(tmp, '.ai', 'rules', 'good.md'), '# G');
+  it('Claude Code: EMPTY_RENDERED writes CLAUDE.md with Rules + Lifecycle headings but no list items', async () => {
     const writer = new FileWriter(tmp);
-    await generateWindsurf(tmp, writer);
-    expect(await fs.readFile(path.join(tmp, '.windsurfrules'), 'utf-8')).toMatch(/G/);
+    const results = await generateClaudeCode(writer, EMPTY_RENDERED, FAKE_CONTEXT);
+
+    expect(results).toHaveLength(1);
+    const claudeMd = await fs.readFile(path.join(tmp, 'CLAUDE.md'), 'utf-8');
+    expect(claudeMd).toMatch(/# Empty Agent/);
+    expect(claudeMd).toMatch(/## Rules/);
+    expect(claudeMd).toMatch(/## Lifecycle/);
+    expect(claudeMd).not.toMatch(/^- \[/m);
+    expect(await exists(path.join(tmp, '.claude/rules'))).toBe(false);
+    expect(await exists(path.join(tmp, '.claude/commands'))).toBe(false);
+  });
+
+  it('Copilot: AGENT-only RenderedContext still produces the merged file', async () => {
+    const writer = new FileWriter(tmp);
+    const results = await generateVsCodeCopilot(writer, EMPTY_RENDERED, FAKE_CONTEXT);
+
+    expect(results).toHaveLength(1);
+    const body = await fs.readFile(
+      path.join(tmp, '.github/copilot-instructions.md'),
+      'utf-8',
+    );
+    expect(body).toMatch(/# Empty Agent/);
+    expect(body).not.toMatch(/## Lifecycle:/);
+  });
+
+  it('Windsurf: EMPTY_RENDERED writes only .windsurfrules', async () => {
+    const writer = new FileWriter(tmp);
+    const results = await generateWindsurf(writer, EMPTY_RENDERED, FAKE_CONTEXT);
+
+    expect(results).toHaveLength(1);
+    const root = await fs.readFile(path.join(tmp, '.windsurfrules'), 'utf-8');
+    expect(root).toMatch(/# Empty Agent/);
+    expect(await exists(path.join(tmp, '.windsurf/rules'))).toBe(false);
+  });
+
+  it('Antigravity: EMPTY_RENDERED writes zero files', async () => {
+    const writer = new FileWriter(tmp);
+    const results = await generateAntigravity(writer, EMPTY_RENDERED, FAKE_CONTEXT);
+
+    expect(results).toHaveLength(0);
+    expect(await exists(path.join(tmp, '.agents'))).toBe(false);
+  });
+
+  it('Cursor: glob directive emits YAML list, not a JSON-stringified single line', async () => {
+    const writer = new FileWriter(tmp);
+    const ctx: RenderedContext = {
+      agent: '# Agent\n',
+      rules: {
+        'data-layer-migrations':
+          '---\ndescription: Data layer rule\n---\n\n# Data Layer\n\nBody.\n',
+      },
+      lifecycle: {},
+    };
+    await generateCursor(writer, ctx, FAKE_CONTEXT);
+
+    const file = await fs.readFile(
+      path.join(tmp, '.cursor/rules/data-layer-migrations.mdc'),
+      'utf-8',
+    );
+    expect(file).toMatch(/globs:\n  - "prisma\/\*\*\/\*"/);
+    expect(file).not.toMatch(/globs:\s*"\[/);
   });
 });

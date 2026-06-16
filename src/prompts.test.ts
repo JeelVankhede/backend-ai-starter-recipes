@@ -36,20 +36,17 @@ describe('askQuestions', () => {
     mockStandardSelectsAndInputs();
     vi.mocked(checkbox)
       .mockResolvedValueOnce(['sentry'])
-      .mockResolvedValueOnce(['cursor'])
-      .mockResolvedValueOnce(['plan-review']);
+      .mockResolvedValueOnce(['cursor']);
     const answers = await askQuestions();
     expect(answers.projectName).toBe('proj-x');
     expect(answers.ideTargets).toEqual(['cursor']);
-    expect(answers.skills).toEqual(['plan-review']);
   });
 
   it('expands ideTargets when "all" is selected', async () => {
     mockStandardSelectsAndInputs();
     vi.mocked(checkbox)
       .mockResolvedValueOnce(['sentry'])
-      .mockResolvedValueOnce(['all'])
-      .mockResolvedValueOnce(['plan-review']);
+      .mockResolvedValueOnce(['all']);
     const answers = await askQuestions();
     expect(answers.ideTargets).toEqual([
       'cursor',
@@ -57,26 +54,6 @@ describe('askQuestions', () => {
       'vscode-copilot',
       'antigravity',
       'windsurf',
-    ]);
-  });
-
-  it('expands skills when "all" is selected', async () => {
-    mockStandardSelectsAndInputs();
-    vi.mocked(checkbox)
-      .mockResolvedValueOnce(['sentry'])
-      .mockResolvedValueOnce(['cursor'])
-      .mockResolvedValueOnce(['all']);
-    const answers = await askQuestions();
-    expect(answers.skills).toEqual([
-      'plan-review',
-      'code-review',
-      'qa',
-      'ship',
-      'document-release',
-      'retro',
-      'db-migration-review',
-      'api-contract-check',
-      'dependency-audit',
     ]);
   });
 });

@@ -6,13 +6,13 @@ description: Understand backend goal, stack, contracts, and operational risk bef
 
 ## Stage Goal
 
-Understand the requested backend change, selected {{framework}} stack, existing project conventions, and operational constraints before proposing work.
+Inspect backend structure and operational constraints before recommending changes. Understand the requested change, the selected {{framework}} stack, existing project conventions, and the operational, data, and security risks involved before proposing work.
 
 ## Inputs Needed
 
 - User goal and acceptance criteria.
-- Existing routes/controllers, services, data models, migrations, auth boundaries, integrations, async jobs, logs, and tests.
-- Current `.ai/rules/` and `.ai/skills/` guidance.
+- Existing routes/controllers, services, data models, migrations, auth boundaries, integrations, async jobs, logging, and tests.
+- Your project's rule guidance for architecture, API, data, security, integrations, async work, observability, and testing.
 - Runtime constraints around compatibility, data safety, security, rollout, and rollback.
 
 ## AI Behavior Expected
@@ -20,8 +20,8 @@ Understand the requested backend change, selected {{framework}} stack, existing 
 - Restate the goal in concrete backend terms.
 - Inspect relevant files before asking questions the repo can answer.
 - Identify likely API contract, data layer, auth/security, integration, async, observability, and test impact.
-- Surface high-risk areas early, especially destructive migrations, public API changes, auth behavior, and third-party calls.
-- Ask for clarification only when a decision cannot be discovered safely.
+- Surface high-risk areas early — especially destructive migrations, public API changes, auth behavior, idempotency on external delivery, and third-party calls.
+- Ask for clarification only when a decision cannot be discovered safely from the repo.
 
 ## AI Behavior Forbidden
 
@@ -29,15 +29,17 @@ Understand the requested backend change, selected {{framework}} stack, existing 
 - Guessing framework, ORM, validation, auth, or test conventions without inspection.
 - Expanding scope beyond the requested backend behavior.
 - Treating API, data, or auth changes as low risk by default.
+- Silent public API changes.
 
 ## Output Expected
 
-- Restated goal.
-- Inspected backend areas.
+- Restated goal in concrete backend terms.
+- Inspected backend areas and current patterns.
 - Known constraints and missing context.
-- Initial risk areas.
+- Initial risk areas (contracts, data, auth, integrations, async, observability).
+- Open questions for the user.
 - Recommended next lifecycle stage.
 
 ## Quality Bar
 
-Think is complete when the AI can name the likely backend files, contracts, data/auth risks, and unresolved decisions before planning.
+Think is complete when the AI can name the likely backend files, contracts, data/auth/integration risks, and unresolved decisions before planning.

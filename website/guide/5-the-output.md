@@ -1,136 +1,108 @@
 # Understanding the output
 
-## Canonical tree: `.ai/`
+## What gets generated
 
-Everything else is derived from here. Commit `.ai/` (and your chosen IDE files) like normal project config.
-The CLI creates repo instructions and adapter files, not a runnable backend service. Treat the generated `.ai/` tree as a starting operating manual for your project and edit it after reviewing the output.
+The CLI writes adapter-native files directly into your project. You get only the files for the IDEs you selected — nothing else is created.
 
-```text
-.ai/
-├── AGENT.md                 # Core agent identity + principles + quality gates
-├── lifecycle/               # Think, Plan, Build, Review, Test, Ship, Reflect
-├── rules/                   # Always-on standards (Markdown)
-├── skills/<name>/           # Workflows (SKILL.md, sometimes checklist.md)
-├── context/                 # You refine: domain map + approved tech stack
-└── tracking/                # Optional metrics / iteration notes
-```
+Commit these files like any other project config. The CLI creates AI instructions and adapter files, not a runnable backend service. Review and edit the generated content before treating it as authoritative.
 
-`rules/data-layer.md` is omitted when you chose **no ORM**. Skills appear only for workflows you selected.
+| Adapter | What gets written |
+| --- | --- |
+| **Cursor** | `.cursor/rules/index.mdc` (agent + context) · `.cursor/rules/<rule>.mdc` (9 rules, per-rule globs) · `.cursor/skills/<stage>/SKILL.md` (7 lifecycle stages) |
+| **Claude Code** | `.claude/rules/<rule>.md` (9 rules) · `.claude/commands/<stage>.md` (7 lifecycle stages) · `CLAUDE.md` (load-when pointer index) |
+| **VS Code Copilot** | `.github/copilot-instructions.md` (agent + all rules + all lifecycle stages merged into one file) |
+| **Windsurf** | `.windsurf/rules/<rule>.md` (9 rules) · `.windsurf/rules/lifecycle-<stage>.md` (7 stages) · `.windsurfrules` (agent + context) |
+| **Antigravity** | `.agents/workflows/<stage>.md` (7 lifecycle stages) |
 
-## Lifecycle
+Select one or more adapters during the interactive prompt. Only the files for selected adapters are written.
 
-Lifecycle files live under `.ai/lifecycle/`:
+The `data-layer-migrations` rule is included only when an ORM was selected (Prisma, TypeORM, Drizzle, MikroORM, or Knex).
 
-| Stage | Purpose |
-|-------|---------|
-| `think.md` | Understand the backend goal, stack, contracts, data/auth risks, and constraints before planning |
-| `plan.md` | Name affected APIs, data models, migrations, auth boundaries, integrations, jobs, risks, and tests |
-| `build.md` | Implement only the approved backend scope |
-| `review.md` | Check correctness, API compatibility, data integrity, security, observability, and adapter output |
-| `test.md` | Run or define validation proportional to backend risk |
-| `ship.md` | Summarize changes, validation, release notes, breaking changes, and rollback notes |
-| `reflect.md` | Capture backend template gaps and follow-up tasks |
-
-## Rules (what they steer)
+## Rules
 
 | Rule file | What it controls |
-|-----------|------------------|
-| `architecture.md` | Module/router/plugin layout, DI, repository pattern, shutdown |
-| `api-patterns.md` | Validation, OpenAPI, pagination, rate limits, CORS, versioning |
-| `errors-logging-security.md` | Errors, logging, authz, observability hooks |
-| `external-integrations.md` | Third-party clients, retries, mapping failures |
-| `testing.md` | Unit vs e2e, framework idioms, mocking |
-| `pre-commit.md` | Build / lint / test gates before commit |
-| `async-patterns.md` | Queues, jobs, idempotency, cron |
+| --- | --- |
+| `architecture-api.md` | Module/router/plugin layout, DI, repository pattern, API design, OpenAPI, pagination, versioning |
+| `auth-security.md` | Authentication, authorisation, secrets handling |
+| `data-layer-migrations.md` | ORM schema, migrations, repositories *(if ORM ≠ none)* |
+| `errors-logging-observability.md` | Error handling, logging, observability hooks |
+| `integrations-async.md` | Third-party clients, retries, queues, jobs, idempotency, cron |
 | `environment.md` | Config, env files, Docker, flags |
 | `git-conventions.md` | Branches, commits, PR focus |
-| `data-layer.md` | ORM schema, migrations, repositories *(if ORM ≠ none)* |
+| `pre-commit.md` | Build / lint / test gates before commit |
+| `testing.md` | Unit vs e2e, framework idioms, mocking |
 
-## Skills (when to run them)
+## Lifecycle stages
 
-| Skill | Purpose | Typical moment |
-|-------|---------|----------------|
-| `plan-review` | Staff-level plan before code | After a written plan, before implementation |
-| `code-review` | Diff review with checklist | Before merge / after a big change |
-| `qa` | Build, tests, API health-style pass | Before calling a feature “done” |
-| `ship` | Commit, push, open PR | When you are ready to land work |
-| `document-release` | Refresh README / changelog from last change | After shipping |
-| `retro` | Short productivity retro | End of week / sprint |
-| `db-migration-review` | Safe migrations | Before merging schema changes |
-| `api-contract-check` | Breaking API detection | When DTOs or routes change |
-| `dependency-audit` | npm audit + necessity | Dependency bumps |
+The 7 lifecycle stages are written in adapter-native paths (see table above):
 
-## Context and tracking
+- **think** — understand the backend goal, stack, contracts, data/auth risks, and constraints before planning
+- **plan** — name affected APIs, data models, migrations, auth boundaries, integrations, jobs, risks, and tests
+- **build** — implement only the approved backend scope
+- **review** — check correctness, API compatibility, data integrity, security, and observability
+- **test** — run or define validation proportional to backend risk
+- **ship** — summarize changes, validation, release notes, breaking changes, and rollback notes
+- **reflect** — capture backend template gaps and follow-up tasks
 
-- **`context/domain-map.md`** — Fill in real domains, directories, and pitfalls for *your* product.  
-- **`context/tech-stack.md`** — Table of approved libraries; keeps the agent from freelancing new deps.  
-- **`tracking/efficiency.md`** — Space to log accept/reject patterns and tighten rules over time.
+## Per-adapter output
 
-## IDE adapters
+### Cursor
 
-```mermaid
-flowchart TB
-  AI[".ai/ AGENT + rules + skills"]
-  AI --> CUR["Cursor: .cursor/rules/*.mdc + .cursor/skills/"]
-  AI --> CLAUDE["Claude Code: CLAUDE.md + .claude/skills/"]
-  AI --> COP["VS Code: .github/copilot-instructions.md"]
-  AI --> AG["Antigravity: .agents/workflows/*.md"]
-  AI --> WS["Windsurf: .windsurfrules"]
+```
+.cursor/rules/index.mdc           # agent identity (alwaysApply: true)
+.cursor/rules/<rule>.mdc          # one file per rule, globs where relevant
+.cursor/skills/think/
+.cursor/skills/plan/
+.cursor/skills/build/
+.cursor/skills/review/
+.cursor/skills/test/
+.cursor/skills/ship/
+.cursor/skills/reflect/
 ```
 
-::: code-group
+### Claude Code
 
-``` [Cursor]
-.cursor/rules/index.mdc      # from AGENT.md
-.cursor/rules/lifecycle.mdc  # from lifecycle/*.md
-.cursor/rules/*.mdc          # from rules/*.md (globs where relevant)
-.cursor/skills/<skill>/     # copied from .ai/skills/
+```
+CLAUDE.md                         # agent identity + all rules merged
+.claude/commands/think.md
+.claude/commands/plan.md
+.claude/commands/build.md
+.claude/commands/review.md
+.claude/commands/test.md
+.claude/commands/ship.md
+.claude/commands/reflect.md
 ```
 
-``` [Claude Code]
-CLAUDE.md                    # AGENT + lifecycle + rules merged
-.claude/skills/<skill>/      # copied skills
+### VS Code Copilot
+
+```
+.github/copilot-instructions.md   # agent identity + all rules merged
 ```
 
-``` [VS Code Copilot]
-.github/copilot-instructions.md   # AGENT + lifecycle + rules merged
+### Windsurf
+
+```
+.windsurfrules                         # agent identity (slim doc)
+.windsurf/rules/<rule>.md              # one file per rule
+.windsurf/rules/lifecycle-think.md
+.windsurf/rules/lifecycle-plan.md
+.windsurf/rules/lifecycle-build.md
+.windsurf/rules/lifecycle-review.md
+.windsurf/rules/lifecycle-test.md
+.windsurf/rules/lifecycle-ship.md
+.windsurf/rules/lifecycle-reflect.md
 ```
 
-``` [Antigravity]
-.agents/workflows/<skill>.md      # one workflow per skill
+### Antigravity
+
+```
+.agents/workflows/think.md
+.agents/workflows/plan.md
+.agents/workflows/build.md
+.agents/workflows/review.md
+.agents/workflows/test.md
+.agents/workflows/ship.md
+.agents/workflows/reflect.md
 ```
 
-``` [Windsurf]
-.windsurfrules               # AGENT + lifecycle + rules merged
-```
-
-:::
-
-## Concrete example (NestJS + Prisma preset)
-
-A typical output includes `.ai/` plus adapter folders from the preset’s IDE list, for example:
-
-```text
-my-nestjs-app/
-├── .ai/
-│   ├── AGENT.md
-│   ├── lifecycle/
-│   │   ├── think.md
-│   │   ├── plan.md
-│   │   └── …
-│   ├── rules/
-│   │   ├── architecture.md
-│   │   ├── data-layer.md
-│   │   └── …
-│   ├── skills/plan-review/SKILL.md
-│   ├── skills/code-review/SKILL.md
-│   ├── skills/code-review/checklist.md
-│   └── …
-├── .cursor/rules/*.mdc
-├── CLAUDE.md
-└── .claude/skills/…
-```
-
----
-
-**Next:** put it together in a day-to-day loop — [Recommended workflow](/guide/6-workflow).
+**Next:** [Recommended workflow](/guide/6-workflow).

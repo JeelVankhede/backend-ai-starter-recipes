@@ -1,38 +1,84 @@
 /**
- * Creates directories and writes generated files under a target project root.
+ * Creates directories and writes generated files under a target project root,
+ * with three modes controlling re-run behavior.
  * @module writer
  */
 import fs from 'fs/promises';
 import path from 'path';
 import chalk from 'chalk';
+import type { WriteMode, WriteResult } from './types.js';
 
 /**
  * Writes paths relative to a single output directory (the user's project folder).
+ *
+ * Modes:
+ * - `backup` (default): existing target → copy to `<path><backupSuffix>`, then write new.
+ * - `skip-existing`: existing target → no write, no backup.
+ * - `overwrite`: existing target → write unconditionally, no backup.
+ *
+ * Re-running `backup` mode against an already-backed-up file overwrites the prior backup
+ * (single-slot rotation; matches Notion §WP-C Q2 resolution).
  */
 export class FileWriter {
   /**
-   * @param outputDir - Absolute path to the project directory receiving `.ai/`, etc.
+   * @param outputDir - Absolute path to the consumer's project directory.
+   * @param mode - File write mode; default `backup`.
+   * @param backupSuffix - Suffix appended for the backup file path (e.g. `.bare-backup`).
    */
-  constructor(private outputDir: string) {}
+  constructor(
+    private outputDir: string,
+    private mode: WriteMode = 'backup',
+    private backupSuffix: string = '.backup',
+  ) {}
 
   /**
-   * Ensures parent dirs exist, then writes UTF-8 text (trimmed + trailing newline).
-   * @param relativePath - Path relative to output (e.g. `.ai/AGENT.md`)
-   * @param content - File body
+   * Ensures parent dirs exist, then writes UTF-8 text (trimmed + trailing newline)
+   * subject to the configured `WriteMode`.
+   * @param relativePath - Path relative to output (e.g. `.cursor/rules/index.mdc`).
+   * @param content - File body.
+   * @returns The write result with relative path and status.
    */
-  async write(relativePath: string, content: string): Promise<void> {
+  async write(relativePath: string, content: string): Promise<WriteResult> {
     const fullPath = path.join(this.outputDir, relativePath);
     const dir = path.dirname(fullPath);
-
     await fs.mkdir(dir, { recursive: true });
-    await fs.writeFile(fullPath, content.trim() + '\n', 'utf-8');
 
-    console.log(chalk.green('✓ Created:'), chalk.dim(relativePath));
+    const exists = await fs
+      .access(fullPath)
+      .then(() => true)
+      .catch(() => false);
+
+    if (this.mode === 'skip-existing' && exists) {
+      console.log(chalk.dim('↷ Skipped:'), chalk.dim(relativePath), chalk.dim('(already exists)'));
+      return { path: relativePath, status: 'skipped' };
+    }
+
+    if (this.mode === 'backup' && exists) {
+      const backupRelPath = relativePath + this.backupSuffix;
+      const backupFullPath = fullPath + this.backupSuffix;
+      await fs.copyFile(fullPath, backupFullPath);
+      await fs.writeFile(fullPath, content.trim() + '\n', 'utf-8');
+      console.log(
+        chalk.yellow('◈ Backed up:'),
+        chalk.dim(relativePath),
+        chalk.dim('→'),
+        chalk.dim(backupRelPath),
+      );
+      return { path: relativePath, status: 'backed-up' };
+    }
+
+    await fs.writeFile(fullPath, content.trim() + '\n', 'utf-8');
+    if (exists) {
+      console.log(chalk.cyan('↺ Overwritten:'), chalk.dim(relativePath));
+      return { path: relativePath, status: 'overwritten' };
+    }
+    console.log(chalk.green('✔ Created:'), chalk.dim(relativePath));
+    return { path: relativePath, status: 'created' };
   }
 
   /**
    * Removes a subdirectory under output (e.g. before a clean regen). Errors are ignored.
-   * @param relativeDir - Directory relative to output root
+   * @param relativeDir - Directory relative to output root.
    */
   async ensureCleanOutputDir(relativeDir: string) {
     const fullPath = path.join(this.outputDir, relativeDir);

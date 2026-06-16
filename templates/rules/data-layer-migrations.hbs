@@ -1,13 +1,40 @@
-# Data Layer ({{orm}})
+---
+description: Guide data persistence and migration safety in Bare-generated projects.
+---
 
-Use this rule with `.ai/lifecycle/plan.md`, `.ai/lifecycle/build.md`, `.ai/lifecycle/review.md`, `.ai/lifecycle/test.md`, and `.ai/lifecycle/ship.md`.
+# Data Layer And Migrations ({{orm}})
 
-Before changing persistence, identify data model impact, query ownership, migration risk, deployment order, rollback/remediation path, and tests.
+Guide data persistence and migration safety in Bare-generated projects.
 
-## Repository Pattern
+Use this rule during the Plan, Build, Review, Test, and Ship stages.
+
+This project uses an Object-Relational Mapping (ORM) layer to handle persistence. Before changing persistence, identify data model impact, query ownership, migration risk, deployment order, rollback/remediation path, and tests.
+
+## AI Responsibilities
+
+- Identify data model impact before editing.
+- Separate schema changes from application logic where the stack supports it.
+- Name destructive operations.
+- Include rollback notes for migrations.
+- Validate data access paths and failure modes.
+
+## AI Must Avoid
+
+- Dropping, renaming, or transforming data without explicit approval.
+- Editing applied migrations.
+- Hiding migration risk inside implementation details.
+- Bypassing repositories or transaction boundaries when conventions exist.
+- Persisting sensitive values without encryption, hashing, or masking requirements.
+- Changing persistence behavior without tests or manual checks.
+
+## Stack-Specific Guidance
+
+Follow the existing ORM, query builder, or migration tool. Prefer reversible migrations unless a one-way operation is explicitly accepted.
+
+### Repository Pattern
 {{> repositoryPattern }}
 
-## Schema & Models
+### Schema & Models
 
 {{#if hasPrisma}}
 - **Schema Location:** `{{ormSchemaPath}}`
@@ -22,7 +49,7 @@ Before changing persistence, identify data model impact, query ownership, migrat
 {{else if hasDrizzle}}
 - **Schema Location:** `{{ormSchemaPath}}`
 - Define tables using Drizzle's generic functions for the specific SQL dialect.
-- Use `uuid('id').defaultRandom().primaryKey()`
+- Use `uuid('id').defaultRandom().primaryKey()`.
 {{else if hasMikroORM}}
 - **Entities Location:** `{{ormSchemaPath}}`
 - Use `@PrimaryKey({ type: 'uuid' })` with a UUID generator default.
@@ -32,7 +59,7 @@ Before changing persistence, identify data model impact, query ownership, migrat
 - Define tables in migration files.
 {{/if}}
 
-## Migration Conventions
+### Migration Conventions
 
 {{> migrationCommands }}
 
@@ -43,19 +70,13 @@ Before changing persistence, identify data model impact, query ownership, migrat
 - Name destructive, irreversible, or large backfill operations before implementation.
 - Keep application code compatible during deploys when a migration and app rollout may overlap.
 
-## Data Seeding
+### Data Seeding
 Use the project's seeding strategy (if provided) to populate lookups and initial admin states for development and testing. Do not rely on ad-hoc SQL inserts during setup.
-
-## Must Avoid
-
-- Dropping, renaming, or transforming data without explicit approval.
-- Editing applied migrations.
-- Bypassing repositories or transaction boundaries when conventions exist.
-- Persisting sensitive values without encryption, hashing, or masking requirements.
 
 ## Acceptance Criteria
 
-- Data impact and migration risk are named.
-- Rollback or remediation path is documented.
+- Data impact is named.
+- Migration risk is documented.
+- Rollback or remediation path is described.
 - Query paths, constraints, indexes, and transactions are reviewed.
 - Migration and data-access tests or manual checks are listed.

@@ -9,8 +9,15 @@
   "apiDocs": "swagger",
   "auth": "jwt-passport",
   "testFramework": "jest",
-  "monitoring": ["sentry"],
+  "monitoring": [
+    "sentry"
+  ],
   "cicd": "github-actions",
-  "ideTargets": ["cursor", "claude-code", "vscode-copilot"],
-  "skills": ["plan-review", "code-review", "qa", "ship"]
+  "ideTargets": [
+    "cursor",
+    "claude-code",
+    "vscode-copilot",
+    "antigravity",
+    "windsurf"
+  ]
 }
