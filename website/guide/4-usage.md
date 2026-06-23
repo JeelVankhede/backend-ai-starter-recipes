@@ -1,5 +1,18 @@
 # Usage
 
+## Demo
+
+<div style="margin: 1.5rem 0;">
+  <iframe
+    width="100%"
+    style="aspect-ratio: 16/9; border: none; border-radius: 8px;"
+    src="https://www.youtube.com/embed/eZFqKtgjQs0"
+    title="BARE demo"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+  </iframe>
+</div>
+
 ## Try it in 2 minutes
 
 Run the NestJS/Prisma preset into a throwaway folder:
