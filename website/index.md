@@ -39,6 +39,8 @@ flowchart LR
 2. **Get** adapter-native files for every IDE you selected — Cursor rules, a `CLAUDE.md`, Copilot instructions, Windsurf rules, or Antigravity workflows. Nothing else lands in your project.  
 3. **Build** features: the agent reads those docs automatically, so you describe *what* you want, not *how* to format every PR.
 
+![BARE walkthrough](/walkthrough.gif)
+
 ::: tip Next step
 Jump to [Try it in 2 minutes](/guide/4-usage#try-it-in-2-minutes), or continue with [The problem](/guide/1-the-problem).
 :::
