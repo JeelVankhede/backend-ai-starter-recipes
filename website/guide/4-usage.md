@@ -2,7 +2,7 @@
 
 ## Demo
 
-![BARE walkthrough](https://github.com/user-attachments/assets/8ab611e5-26ed-45a1-b75f-2405523f8ee1)
+![BARE walkthrough](/walkthrough.gif)
 
 <div style="margin: 1.5rem 0;">
   <iframe
