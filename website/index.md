@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: <span class="decorate">B</span>ackend-<span class="decorate">A</span>i-starter-<span class="decorate">RE</span>cipes
-  text: Stop repeating yourself to AI
-  tagline: Generate opinionated rules, skills, and context so your agent already knows your stack — npm package backend-ai-starter-recipes, CLI bare.
+  text: Stop re-explaining your backend stack to every AI agent.
+  tagline: Opinionated rules, skills, and context for NestJS, Express, Fastify, and Hono — one command, every adapter.
   actions:
     - theme: brand
       text: Try it in 2 minutes
